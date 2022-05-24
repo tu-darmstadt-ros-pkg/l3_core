@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+
+<launch>
+  <test test-name="l3_libs_utest" pkg="l3_libs" type="utest" />
+</launch>

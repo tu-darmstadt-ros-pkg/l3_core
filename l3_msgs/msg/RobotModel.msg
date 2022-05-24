@@ -1,0 +1,6 @@
+RobotDescription robot_description
+
+vigir_pluginlib_msgs/PluginDescription kinematics_plugin
+vigir_pluginlib_msgs/PluginDescription dynamics_plugin
+vigir_pluginlib_msgs/PluginDescription gait_generator_plugin
+vigir_pluginlib_msgs/PluginDescription state_publisher_plugin

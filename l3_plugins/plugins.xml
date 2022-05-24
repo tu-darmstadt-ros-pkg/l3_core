@@ -1,0 +1,43 @@
+<library path="lib/libl3_plugins">
+  <class name="ft_sensor_topic" type="l3::FTSensorTopic" base_class_type="l3::InterfacePlugin">
+    <description>
+      Standard ft sensor interface using topics.
+    </description>
+  </class>
+  <class name="imu_sensor_topic" type="l3::IMUSensorTopic" base_class_type="l3::InterfacePlugin">
+    <description>
+      Standard imu sensor interface using topics.
+    </description>
+  </class>
+  <class name="joint_cmd_interface_topic" type="l3::JointCmdInterfaceTopic" base_class_type="l3::InterfacePlugin">
+    <description>
+      Standard joint command interface using topics.
+    </description>
+  </class>
+  <class name="joint_states_topic" type="l3::JointStatesTopic" base_class_type="l3::InterfacePlugin">
+    <description>
+      Standard joint states interface using topics.
+    </description>
+  </class>
+  <class name="kdl_kinematics" type="l3::KdlKinematics" base_class_type="l3::KinematicsPlugin">
+    <description>
+      Kinematics tool using Orocos KDL.
+    </description>
+  </class>
+
+  <class name="bipedal_gait_generator" type="l3::BipedalGaitGenerator" base_class_type="l3::GaitGeneratorPlugin">
+    <description>
+      Basic gait generator for bipedal robots following alternating step sequences.
+    </description>
+  </class>
+  <class name="cyclic_gait_generator" type="l3::CyclicGaitGenerator" base_class_type="l3::GaitGeneratorPlugin">
+    <description>
+      Basic gait generator for multi-legged robots cycling through a leg list.
+    </description>
+  </class>
+  <class name="quadrupedal_gait_generator" type="l3::QuadrupedalGaitGenerator" base_class_type="l3::GaitGeneratorPlugin">
+    <description>
+      Basic gait generator for quadrupedal robots which supports different gaits.
+    </description>
+  </class>
+</library>
