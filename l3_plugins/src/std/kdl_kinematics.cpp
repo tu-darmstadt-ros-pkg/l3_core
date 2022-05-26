@@ -2,9 +2,8 @@
 
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolverpos_nr.hpp>
-#include <kdl/chainiksolverpos_lma.hpp>
-#include <kdl/chainiksolverpos_nr_jl.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
+#include <kdl/chainiksolvervel_wdls.hpp>
 
 #include <l3_libs/conversions/l3_kdl_conversions.h>
 #include <l3_libs/yaml_parser.h>
@@ -29,6 +28,8 @@ bool KdlKinematics::loadParams(const vigir_generic_params::ParameterSet& params)
     if (!getYamlValue(p, center_to_root_))
       ROS_ERROR("[%s] initialize: Failed to read 'center_to_root' parameter!", getName().c_str());
   }
+
+  getParam("ignore_foot_orientation", ignore_foot_orientation_, false, true);
 
   /// TODO Build in switch
   getParam("take_com_from_config", com_switch_, false, true);
@@ -176,6 +177,8 @@ bool KdlKinematics::calcForwardKinematicsForChain(const std::string& root_link, 
 bool KdlKinematics::calcInverseKinematicsForChain(const std::string& root_link, const std::string& tip_link, const Pose& goal, const std::vector<double>& curr_q,
                                                   std::vector<double>& q) const
 {
+  q.clear();
+
   int max_iterations = 100;
   double eps = 1e-6;
 
@@ -187,26 +190,43 @@ bool KdlKinematics::calcInverseKinematicsForChain(const std::string& root_link, 
     return false;
   }
 
-  KDL::ChainFkSolverPos_recursive fk_solver(chain);
-  KDL::ChainIkSolverVel_pinv ik_solver_vel(chain);
-  KDL::ChainIkSolverPos_NR ik_solver_pos(chain, fk_solver, ik_solver_vel, max_iterations, eps);
+  int nr_of_joints = chain.getNrOfJoints();
+
+  // loosening orientation constraints
+  if (ignore_foot_orientation_)
+  {
+    chain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotX), KDL::Frame(KDL::Rotation::RPY(0.0, 0.0, 0.0))));
+    chain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotY), KDL::Frame(KDL::Rotation::RPY(0.0, 0.0, 0.0))));
+    chain.addSegment(KDL::Segment(KDL::Joint(KDL::Joint::RotZ), KDL::Frame(KDL::Rotation::RPY(0.0, 0.0, 0.0))));
+  }
+
+  // instantiate IK solver
+  ChainIkSolverVelPtr ik_solver_vel = makeShared<KDL::ChainIkSolverVel_pinv>(chain);
+  ChainFkSolverPosPtr fk_solver = makeShared<KDL::ChainFkSolverPos_recursive>(chain);
+  ChainIkSolverPosPtr ik_solver_pos = makeShared<KDL::ChainIkSolverPos_NR>(chain, *fk_solver, *ik_solver_vel, max_iterations, eps);
 
   KDL::JntArray kdl_q(chain.getNrOfJoints());
   KDL::JntArray kdl_q_init(chain.getNrOfJoints());
 
-  for (size_t i = 0; i < chain.getNrOfJoints(); i++)
+  // copy start state
+  for (size_t i = 0; i < curr_q.size(); i++)
     kdl_q_init(i) = curr_q[i];
 
+  for (size_t i = curr_q.size(); i < chain.getNrOfJoints(); i++)
+    kdl_q_init(i) = 0.0;
+
+  // try to solve IK
   KDL::Frame f_dest;
   l3::poseL3ToKdl(goal, f_dest);
 
-  if (ik_solver_pos.CartToJnt(kdl_q_init, f_dest, kdl_q) < KDL::SolverI::E_NOERROR)
+  if (ik_solver_pos->CartToJnt(kdl_q_init, f_dest, kdl_q) < KDL::SolverI::E_NOERROR)
   {
-    // ROS_WARN_THROTTLE(1.0, "[KDLKinematicsPlugin] calcInverseKinematicsForChain: No inverse solution found between '%s' and '%s'", root_link.c_str(), tip_link.c_str());
+    ROS_WARN_THROTTLE(1.0, "[KDLKinematicsPlugin] calcInverseKinematicsForChain: No inverse solution found between '%s' and '%s'", root_link.c_str(), tip_link.c_str());
     return false;
   }
 
-  for (int i = 0; i < chain.getNrOfJoints(); i++)
+  // write back result
+  for (int i = 0; i < nr_of_joints; i++)
     q.push_back(l3::normalizeAngle(kdl_q(i)));
 
   return true;

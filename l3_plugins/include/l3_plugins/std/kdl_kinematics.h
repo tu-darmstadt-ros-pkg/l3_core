@@ -31,6 +31,9 @@
 
 #include <ros/ros.h>
 
+#include <kdl/chainfksolver.hpp>
+#include <kdl/chainiksolver.hpp>
+
 #include <kdl_parser/kdl_parser.hpp>
 
 #include <l3_plugins/base/kinematics_plugin.h>
@@ -43,6 +46,10 @@ public:
   // typedefs
   typedef l3::SharedPtr<KdlKinematics> Ptr;
   typedef l3::SharedPtr<const KdlKinematics> ConstPtr;
+
+  using ChainFkSolverPosPtr = SharedPtr<KDL::ChainFkSolverPos>;
+  using ChainIkSolverPosPtr = SharedPtr<KDL::ChainIkSolverPos>;
+  using ChainIkSolverVelPtr = SharedPtr<KDL::ChainIkSolverVel>;
 
   KdlKinematics(const std::string& name = "kdl_kinematics");
 
@@ -77,7 +84,9 @@ private:
   std::map<std::string, KDL::TreeElement> all_links_;
   KDL::Tree tree_;
 
+  // parameters
   Transform center_to_root_;  // transformation from geometric center of feet to root link
+  bool ignore_foot_orientation_;
 };
 }  // namespace l3
 
