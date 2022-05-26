@@ -117,8 +117,17 @@ template <typename Map, typename Container>
 Map footholdArrayToMap(const Container& array)
 {
   Map map;
-  for (auto& f : array)
-    map.emplace(f.idx, f);
+  for (auto& fh : array)
+    map.emplace(fh.idx, fh);
+  return map;
+}
+
+template <typename Map, typename Container>
+Map floatingBaseArrayToMap(const Container& array)
+{
+  Map map;
+  for (auto& fb : array)
+    map.emplace(fb.idx, fb);
   return map;
 }
 
