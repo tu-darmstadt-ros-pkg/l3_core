@@ -110,10 +110,9 @@ visualization_msgs::Marker footToFootMarker(const l3_msgs::Foothold& foot, const
   else if (foot_info.shape == FootInfo::Shape::CUBOID)
   {
     marker.type = visualization_msgs::Marker::CUBE;
-    marker.pose = foot.pose;
 
     Pose offset(0.0, 0.0, 0.5 * foot_info.size.z());
-    pose = pose * offset;
+    pose = pose * offset * foot_info.mesh_offset;
     poseL3ToMsg(pose, marker.pose);
 
     vectorL3ToMsg(foot_info.size, marker.scale);
@@ -121,10 +120,9 @@ visualization_msgs::Marker footToFootMarker(const l3_msgs::Foothold& foot, const
   else if (foot_info.shape == FootInfo::Shape::SPHERICAL)
   {
     marker.type = visualization_msgs::Marker::SPHERE;
-    marker.pose = foot.pose;
 
     Pose offset(0.0, 0.0, 0.5 * foot_info.size.z());
-    pose = pose * offset;
+    pose = pose * offset * foot_info.mesh_offset;
     poseL3ToMsg(pose, marker.pose);
 
     vectorL3ToMsg(foot_info.size, marker.scale);
@@ -154,42 +152,13 @@ visualization_msgs::Marker baseToBaseMarker(const l3_msgs::FloatingBase& base, c
   Pose pose;
   poseMsgToL3(base.pose, pose);
 
-  if (!base_info.mesh_resource.empty())
-  {
-    marker.type = visualization_msgs::Marker::MESH_RESOURCE;
-    marker.mesh_resource = base_info.mesh_resource;
+  marker.type = visualization_msgs::Marker::SPHERE;
+  marker.scale.x = 0.05;
+  marker.scale.y = 0.05;
+  marker.scale.z = 0.05;
 
-    pose = pose * base_info.mesh_offset;
-    poseL3ToMsg(pose, marker.pose);
-
-    vectorL3ToMsg(base_info.mesh_scale, marker.scale);
-  }
-  else if (base_info.shape == BaseInfo::Shape::CUBOID)
-  {
-    marker.type = visualization_msgs::Marker::CUBE;
-    marker.pose = base.pose;
-
-    Pose offset(0.0, 0.0, 0.5 * 0.07);
-    pose = pose * offset;
-    poseL3ToMsg(pose, marker.pose);
-
-    vectorL3ToMsg(base_info.size, marker.scale);
-  }
-  else if (base_info.shape == BaseInfo::Shape::SPHERICAL)
-  {
-    marker.type = visualization_msgs::Marker::SPHERE;
-    marker.pose = base.pose;
-
-    Pose offset(0.0, 0.0, 0.5 * 0.07);
-    pose = pose * offset;
-    poseL3ToMsg(pose, marker.pose);
-
-    vectorL3ToMsg(base_info.size, marker.scale);
-  }
-  else
-  {
-    ROS_ERROR("Unknown base shape type '%u'!", base_info.shape);
-  }
+  pose = pose * base_info.mesh_offset;
+  poseL3ToMsg(pose, marker.pose);
 
   marker.lifetime = ros::Duration();
 
@@ -356,13 +325,13 @@ visualization_msgs::Marker feetToUpperBodyMarker(const l3_msgs::FootholdArray& f
   // approximate base position
   FootholdArray feet_l3;
   footholdArrayMsgToL3(feet, feet_l3);
-  /// @todo: Use RobotModel here?
+  /// @todo Use RobotModel here?
   Pose pose = calcFeetCenter(feet_l3);
   poseL3ToMsg(pose, marker.pose);
 
   // determine shift of polygon based on orientation
   BaseInfo base_info = robot_description.getBaseInfo(BaseInfo::MAIN_BODY_IDX);
-  Pose shifted = pose * base_info.link_to_center_offset;
+  Pose shifted = pose * base_info.mesh_offset;
 
   marker.pose.position.x = shifted.x();
   marker.pose.position.y = shifted.y();
@@ -408,6 +377,7 @@ visualization_msgs::MarkerArray stepPlanToUpperBodyMarkerArray(const l3_msgs::Fo
       feet.push_back(p.second);
 
     // transform
+    /// @todo Check if floating base exists and use it instead
     marker = feetToUpperBodyMarker(feet, robot_description, color, false, ns);
     marker.id = static_cast<int>(markers.markers.size());
     markers.markers.push_back(marker);

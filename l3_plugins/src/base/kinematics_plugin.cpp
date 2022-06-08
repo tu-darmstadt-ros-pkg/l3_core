@@ -40,9 +40,9 @@ Transform KinematicsPlugin::calcStaticFeetCenterToBase(const RobotDescription& d
   Transform root_to_base;
 
   if (!calcStaticTransformForChain(root_link_, base_link, root_to_base))
-    ROS_WARN("[%s] calcFeetCenterToBase: Could not determine transform from root ('%s') to base ('%s'). Using identity transform.", getName().c_str(), root_link_.c_str(), base_link.c_str());
+    ROS_WARN("[%s] calcStaticFeetCenterToBase: Could not determine transform from root ('%s') to base ('%s'). Using identity transform.", getName().c_str(), root_link_.c_str(), base_link.c_str());
 
-  return root_to_base * calcStaticFeetCenterToRoot();
+  return calcStaticFeetCenterToRoot() * root_to_base * base_info.link_to_feet_center_offset;
 }
 
 Transform KinematicsPlugin::calcFeetCenterToBase(const RobotDescription& description, const Pose& feet_center, const FootholdArray& footholds) const
@@ -55,7 +55,7 @@ Transform KinematicsPlugin::calcFeetCenterToBase(const RobotDescription& descrip
   if (!calcStaticTransformForChain(root_link_, base_link, root_to_base))
     ROS_WARN("[%s] calcFeetCenterToBase: Could not determine transform from root ('%s') to base ('%s'). Using identity transform.", getName().c_str(), root_link_.c_str(), base_link.c_str());
 
-  return root_to_base * calcFeetCenterToRoot(feet_center, footholds);
+  return calcFeetCenterToRoot(feet_center, footholds) * root_to_base * base_info.link_to_feet_center_offset;
 }
 
 Transform KinematicsPlugin::calcFeetCenterToBase(const RobotDescription& description, const Pose& feet_center, const FootholdConstPtrArray& footholds) const
@@ -68,7 +68,7 @@ Transform KinematicsPlugin::calcFeetCenterToBase(const RobotDescription& descrip
   if (!calcStaticTransformForChain(root_link_, base_link, root_to_base))
     ROS_WARN("[%s] calcFeetCenterToBase: Could not determine transform from root ('%s') to base ('%s'). Using identity transform.", getName().c_str(), root_link_.c_str(), base_link.c_str());
 
-  return calcFeetCenterToRoot(feet_center, footholds) * root_to_base;
+  return calcFeetCenterToRoot(feet_center, footholds) * root_to_base * base_info.link_to_feet_center_offset;
 }
 
 bool KinematicsPlugin::calcLegIK(const Pose& base_pose, const Foothold& foothold, const RobotDescription& description, const std::vector<double>& cur_q,

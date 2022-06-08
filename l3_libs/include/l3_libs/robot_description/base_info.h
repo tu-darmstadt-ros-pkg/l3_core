@@ -71,7 +71,7 @@ struct BaseInfo
   Shape shape;
   Vector3 size;
   std::string link;
-  Transform link_to_center_offset;  // position (offset) of center of bounding box given in robot's "base" link (base frame -> box center frame transform)
+  Transform link_to_feet_center_offset;  // position (offset) of center of bounding box given in robot's "base" link (base frame -> box center frame transform)
 
   // visualization related parameters
   std_msgs::ColorRGBA color;

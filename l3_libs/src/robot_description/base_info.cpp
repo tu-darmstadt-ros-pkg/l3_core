@@ -44,7 +44,7 @@ BaseInfo::BaseInfo(const XmlRpc::XmlRpcValue& params)
   if (!getYamlValue(p, "link", link))
     return;
 
-  if (!getYamlValue(p, "link_to_center_offset", link_to_center_offset))
+  if (!getYamlValue(p, "link_to_feet_center_offset", link_to_feet_center_offset))
     return;
 
   // parse vis section (optional)
@@ -74,7 +74,7 @@ void BaseInfo::fromMsg(const l3_msgs::BaseInfo& msg)
   shape = static_cast<BaseInfo::Shape>(msg.shape);
   vectorMsgToL3(msg.size, size);
   link = msg.link;
-  poseMsgToL3(msg.link_to_center_offset, link_to_center_offset);
+  poseMsgToL3(msg.link_to_center_offset, link_to_feet_center_offset);
   color = msg.color;
   mesh_resource = msg.mesh_resource;
   poseMsgToL3(msg.mesh_offset, mesh_offset);
@@ -87,7 +87,7 @@ void BaseInfo::toMsg(l3_msgs::BaseInfo& msg) const
   msg.shape = shape;
   vectorL3ToMsg(size, msg.size);
   msg.link = link;
-  poseL3ToMsg(link_to_center_offset, msg.link_to_center_offset);
+  poseL3ToMsg(link_to_feet_center_offset, msg.link_to_center_offset);
   msg.color = color;
   msg.mesh_resource = mesh_resource;
   poseL3ToMsg(mesh_offset, msg.mesh_offset);
