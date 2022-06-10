@@ -54,20 +54,18 @@ struct ExpandStatesIdx
     , floating_base_idx(std::move(floating_base_idx))
   {}
 
-  bool operator==(const ExpandStatesIdx& other) const { return (foot_idx == other.foot_idx && floating_base_idx == floating_base_idx); }
+  bool operator==(const ExpandStatesIdx& other) const { return foot_idx == other.foot_idx && floating_base_idx == floating_base_idx; }
 
   bool operator<(const ExpandStatesIdx& other) const
   {
-    /// @todo @Felix Sternkopf: Operator seems to be messed. NEEDS CORRECT DEFINITION!
-    ROS_ERROR_ONCE("Operator< of ExpandStatesIdx is not implemented correctly. Fix it immediatly!");
-    if (floating_base_idx.size() == 1)
-    {
-      return foot_idx < other.foot_idx;
-    }
+    // lexicographically check arrays
+
+    // #1: Try to decide via floating base indeces
+    if (floating_base_idx != other.floating_base_idx)  // (assume to be a quicker check than using foot idx)
+      return floating_base_idx < other.floating_base_idx;
+    // #2: Decide via foot indeces
     else
-    {
-      return foot_idx < other.foot_idx && floating_base_idx < other.floating_base_idx;
-    }
+      return foot_idx < other.foot_idx;
   }
 
   FootIndexArray foot_idx;
