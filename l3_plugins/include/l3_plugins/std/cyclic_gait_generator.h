@@ -37,7 +37,7 @@ namespace l3
 {
 class CyclicGaitGenerator : public GaitGeneratorPlugin
 {
-  typedef std::map<FootIndexArray, FootIndexArray> LookupTable;
+  typedef std::map<ExpandStatesIdx, ExpandStatesIdx> LookupTable;
 
 public:
   // typedefs
@@ -69,7 +69,7 @@ public:
   ExpandStatesIdxArray succMovingPatterns(Step::ConstPtr step, const ExpandStatesIdxArray& last_seq) const override;
 
 protected:
-  bool getExpandStatesIdxArray(const std::string& key, ExpandStatesIdxArray& array);
+  bool getCycleFromYaml(const std::string& key, ExpandStatesIdxArray& array);
 
   ExpandStatesIdxArray cycle_;
   LookupTable succ_;

@@ -21,7 +21,7 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
 
   if (hasParam("cycle"))
   {
-    if (!getExpandStatesIdxArray("cycle", cycle_))
+    if (!getCycleFromYaml("cycle", cycle_))
       return;
   }
   else
@@ -51,31 +51,33 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
   }
   ROS_INFO_STREAM("Cycle: " + out);
 
-  // generate lookup tables
+  // generate lookup table from given cycle as array
   for (size_t i = 0; i < cycle_.size(); i++)
   {
+    // close loop
     if (i == 0)
     {
-      pred_[cycle_.front().foot_idx] = cycle_.back().foot_idx;
-      succ_[cycle_.back().foot_idx] = cycle_.front().foot_idx;
+      pred_[cycle_.front()] = cycle_.back();
+      succ_[cycle_.back()] = cycle_.front();
     }
+    // connect successive elements
     else
     {
-      pred_[cycle_[i].foot_idx] = cycle_[i - 1].foot_idx;
-      succ_[cycle_[i - 1].foot_idx] = cycle_[i].foot_idx;
+      pred_[cycle_[i]] = cycle_[i - 1];
+      succ_[cycle_[i - 1]] = cycle_[i];
     }
   }
 
   // check start patterns
   if (hasParam("start"))
   {
-    if (!getExpandStatesIdxArray("start", start_))
+    if (!getCycleFromYaml("start", start_))
       return;
 
     // sanity check of input
     for (const ExpandStatesIdx& arr : start_)
     {
-      if (pred_.find(arr.foot_idx) == pred_.end())
+      if (pred_.find(arr) == pred_.end())
       {
         ROS_ERROR_NAMED("CyclicGaitGenerator", "[CyclicGaitGenerator] At least one input start option does not match with any element of the given cycle! Fix it immediatly!");
         return;
@@ -93,31 +95,36 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
 ExpandStatesIdxArray CyclicGaitGenerator::predMovingPatterns(Step::ConstPtr /*step*/, const ExpandStatesIdxArray& next_seq) const
 {
   // allow for starting with any leg
-  if (next_seq.empty() || next_seq.front().foot_idx.empty())
+  if (next_seq.empty())
     return start_;
 
-  const FootIndexArray& next = next_seq.front().foot_idx;
+  const ExpandStatesIdx& next = next_seq.front();
+  if (next.foot_idx.empty() && next.floating_base_idx.empty())
+    return start_;
+
   ROS_ASSERT(pred_.find(next) != pred_.end());
-  return ExpandStatesIdxArray{ ExpandStatesIdx{ FootIndexArray{ pred_.find(next)->second }, BaseIndexArray{} } };
+  return ExpandStatesIdxArray{ pred_.find(next)->second };
 }
 
 ExpandStatesIdxArray CyclicGaitGenerator::succMovingPatterns(Step::ConstPtr /*step*/, const ExpandStatesIdxArray& last_seq) const
 {
   // allow for starting with any leg
-  if (last_seq.empty() || last_seq.back().foot_idx.empty())
+  if (last_seq.empty())
     return start_;
 
-  const FootIndexArray& last = last_seq.back().foot_idx;
-  ROS_ASSERT(succ_.find(last) != succ_.end());
+  const ExpandStatesIdx& last = last_seq.back();
+  if (last.foot_idx.empty() && last.floating_base_idx.empty())
+    return start_;
 
-  return ExpandStatesIdxArray{ ExpandStatesIdx{ FootIndexArray{ succ_.find(last)->second }, BaseIndexArray{} } };
+  ROS_ASSERT(succ_.find(last) != succ_.end());
+  return ExpandStatesIdxArray{ succ_.find(last)->second };
 }
 
-bool CyclicGaitGenerator::getExpandStatesIdxArray(const std::string& key, ExpandStatesIdxArray& foot_base)
+bool CyclicGaitGenerator::getCycleFromYaml(const std::string& key, ExpandStatesIdxArray& cycle)
 {
   ROS_ASSERT(robot_description_);
 
-  foot_base.clear();
+  cycle.clear();
   MultiFootIndexArray array;
 
   XmlRpc::XmlRpcValue val;
@@ -146,11 +153,11 @@ bool CyclicGaitGenerator::getExpandStatesIdxArray(const std::string& key, Expand
 
   for (const FootIndexArray& idx_arr : array)
   {
-    foot_base.push_back(ExpandStatesIdx{ idx_arr, BaseIndexArray{} });
+    cycle.push_back(ExpandStatesIdx{ idx_arr, BaseIndexArray{} });
   }
 
   // consistency checks
-  for (const ExpandStatesIdx& idx_arr : foot_base)
+  for (const ExpandStatesIdx& idx_arr : cycle)
   {
     for (const FootIndex& idx : idx_arr.foot_idx)
     {
