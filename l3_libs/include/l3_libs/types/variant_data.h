@@ -247,12 +247,23 @@ public:
     return operator>>(stream, static_cast<std::unordered_map<std::string, VariantData>&>(out));
   }
 
+  /**
+   * @brief Checks if any entity with given name exists
+   * @param name Name to lookup
+   * @return True, if an entity was found
+   */
   bool has(const std::string& name) const
   {
     VariantDataSet::const_iterator itr = find(name);
     return itr != end();
   }
 
+  /**
+   * @brief Checks if any entity of given type and name exists
+   * @param ValueType Desired type of the entity
+   * @param name Name to lookup
+   * @return True, if an entity with specified type was found
+   */
   template <class ValueType>
   bool hasValue(const std::string& name) const
   {
@@ -263,17 +274,46 @@ public:
     return itr->second.isType<ValueType>();
   }
 
+  /**
+   * @brief Type-safe getter of a specific entity. If either the name or type mismatches,
+   * the given default value is returned.
+   * @param ValueType Desired type of the entity
+   * @param name Name to lookup
+   * @param default_value Default value to be returned in case of a miss
+   * @return The value of the found entity, otherwise the default value
+   */
+  template <class ValueType>
+  ValueType getValue(const std::string& name, const ValueType& default_value) const
+  {
+    VariantDataSet::const_iterator itr = find(name);
+    if (itr != end() && itr->second.isType<ValueType>())
+      return itr->second.value<ValueType>();
+    else
+      return default_value;
+  }
+
+  /**
+   * @brief Non-safe getter of a specific entity.
+   * @param ValueType Desired type of the entity
+   * @param name Name to lookup
+   * @param val [out] Output variable to store the found data
+   * @return True, if an entity with specified type was found
+   */
   template <class ValueType>
   bool get(const std::string& name, ValueType& val) const
   {
     VariantDataSet::const_iterator itr = find(name);
     if (itr == end())
       return false;
-
-    return itr->second.value(val);
+    else
+      return itr->second.value(val);
   }
 };
 
+/**
+ * Serializers that are globally used to transform any VariantData and VariantDataSet into
+ * a bytestream and vice versa.
+ */
 class VariantDataSerialization : public Singleton<VariantDataSerialization>
 {
 public:
