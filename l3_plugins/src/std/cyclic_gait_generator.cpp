@@ -98,9 +98,12 @@ ExpandStatesIdxArray CyclicGaitGenerator::predMovingPatterns(Step::ConstPtr /*st
   if (next_seq.empty())
     return start_;
 
-  const ExpandStatesIdx& next = next_seq.front();
+  ExpandStatesIdx next = next_seq.front();
   if (next.foot_idx.empty() && next.floating_base_idx.empty())
     return start_;
+
+  /// @todo Fix as long we cannot define floating base support via yaml
+  next.floating_base_idx.clear();
 
   ROS_ASSERT(pred_.find(next) != pred_.end());
   return ExpandStatesIdxArray{ pred_.find(next)->second };
@@ -112,9 +115,12 @@ ExpandStatesIdxArray CyclicGaitGenerator::succMovingPatterns(Step::ConstPtr /*st
   if (last_seq.empty())
     return start_;
 
-  const ExpandStatesIdx& last = last_seq.back();
+  ExpandStatesIdx last = last_seq.back();
   if (last.foot_idx.empty() && last.floating_base_idx.empty())
     return start_;
+
+  /// @todo Fix as long we cannot define floating base support via yaml
+  last.floating_base_idx.clear();
 
   ROS_ASSERT(succ_.find(last) != succ_.end());
   return ExpandStatesIdxArray{ succ_.find(last)->second };
