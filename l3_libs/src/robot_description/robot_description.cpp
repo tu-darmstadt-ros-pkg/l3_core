@@ -202,12 +202,12 @@ size_t RobotDescription::getLegIdx(const LegIndex& leg_idx) const
     return itr->second;
 }
 
-FootholdArray RobotDescription::getNeutralStance(const Pose& center) const
+FootholdPtrArray RobotDescription::getNeutralStance(const Pose& center) const
 {
-  FootholdArray footholds;
+  FootholdPtrArray footholds;
 
   for (const Foothold& f : neutral_stance_)
-    footholds.push_back(Foothold(f.idx, center * f.pose(), f.header));
+    footholds.push_back(makeShared<Foothold>(f.idx, center * f.pose(), f.header));
 
   return footholds;
 }

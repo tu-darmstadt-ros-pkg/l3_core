@@ -112,23 +112,26 @@ inline std::string strip_const(const std::string& s, const char c) { return vigi
  * Generic helpers
  */
 
-// conversion of
-template <typename Map, typename Container>
-Map footholdArrayToMap(const Container& array)
+// conversion of arrays into maps
+template <typename Map, template<class, class> class Container, class Type>
+Map footholdArrayToMap(const Container<Type, std::allocator<Type>>& array)
 {
   Map map;
   for (auto& fh : array)
-    map.emplace(fh.idx, fh);
+  {
+    if constexpr (l3::is_shared_ptr<Type>::value)
+      map.emplace(fh->idx, fh);
+    else
+      map.emplace(fh.idx, fh);
+  }
   return map;
 }
 
-template <typename Map, typename Container>
-Map floatingBaseArrayToMap(const Container& array)
+template <typename Map, template<class, class> class Container, class Type>
+Map floatingBaseArrayToMap(const Container<Type, std::allocator<Type>>& array)
 {
-  Map map;
-  for (auto& fb : array)
-    map.emplace(fb.idx, fb);
-  return map;
+  // operation is structural identical to footholds
+  return footholdArrayToMap(array);
 }
 
 /**

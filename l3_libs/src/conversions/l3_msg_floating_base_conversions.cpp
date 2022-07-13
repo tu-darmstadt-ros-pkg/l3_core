@@ -16,6 +16,13 @@ void floatingBaseArrayL3ToMsg(const l3::FloatingBaseArray& floating_bases, l3_ms
     msg.push_back(f.toMsg());
 }
 
+void floatingBaseArrayL3ToMsg(const l3::FloatingBasePtrArray& floating_bases, l3_msgs::FloatingBaseArray& msg)
+{
+  msg.clear();
+  for (l3::FloatingBase::ConstPtr f : floating_bases)
+    msg.push_back(f->toMsg());
+}
+
 void floatingBaseArrayL3ToMsg(const l3::FloatingBaseConstPtrArray& floating_bases, l3_msgs::FloatingBaseArray& msg)
 {
   msg.clear();

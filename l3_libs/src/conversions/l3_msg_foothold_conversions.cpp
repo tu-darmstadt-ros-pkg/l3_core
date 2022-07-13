@@ -16,6 +16,13 @@ void footholdArrayL3ToMsg(const l3::FootholdArray& footholds, l3_msgs::FootholdA
     msg.push_back(f.toMsg());
 }
 
+void footholdArrayL3ToMsg(const l3::FootholdPtrArray& footholds, l3_msgs::FootholdArray& msg)
+{
+  msg.clear();
+  for (l3::Foothold::ConstPtr f : footholds)
+    msg.push_back(f->toMsg());
+}
+
 void footholdArrayL3ToMsg(const l3::FootholdConstPtrArray& footholds, l3_msgs::FootholdArray& msg)
 {
   msg.clear();

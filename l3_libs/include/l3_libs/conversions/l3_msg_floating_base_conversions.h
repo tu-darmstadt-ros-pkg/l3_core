@@ -47,6 +47,7 @@ void floatingBaseArrayMsgToL3(const l3_msgs::FloatingBaseArray& msg, FloatingBas
 
 /// Converts a FloatingBaseArray into a FloatingBaseArray message
 void floatingBaseArrayL3ToMsg(const l3::FloatingBaseArray& floating_bases, l3_msgs::FloatingBaseArray& msg);
+void floatingBaseArrayL3ToMsg(const l3::FloatingBasePtrArray& floating_bases, l3_msgs::FloatingBaseArray& msg);
 void floatingBaseArrayL3ToMsg(const l3::FloatingBaseConstPtrArray& floating_bases, l3_msgs::FloatingBaseArray& msg);
 }  // namespace l3
 

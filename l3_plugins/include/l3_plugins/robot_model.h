@@ -94,7 +94,7 @@ public:
    * @param center Robot's center from which the neutral stance is derived
    * @return Neutral stance as array of footholds
    */
-  static inline FootholdArray getNeutralStance(const Pose& center = Pose()) { return instance().robot_description_->getNeutralStance(center); }
+  static inline FootholdPtrArray getNeutralStance(const Pose& center = Pose()) { return instance().robot_description_->getNeutralStance(center); }
 
   /**
    * @brief Calculates robot's feet center based on the given foothold configuration.

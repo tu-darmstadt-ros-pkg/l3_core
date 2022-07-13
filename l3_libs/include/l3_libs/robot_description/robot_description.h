@@ -125,14 +125,14 @@ public:
    * @param center Robot's center from which the neutral stance is derived
    * @return Neutral stance as array of footholds
    */
-  FootholdArray getNeutralStance(const Pose& center = Pose()) const;
+  FootholdPtrArray getNeutralStance(const Pose& center = Pose()) const;
 
   /**
    * @brief Generates neutral stance aligned to the given foothold which is part of the neutral stance pose.
    * @param foothold Foothold from which the neutral stance is derived
    * @return Neutral stance as array of footholds
    */
-  inline FootholdArray getNeutralStance(const Foothold& foothold) const { return getNeutralStance(foothold.pose() * getFootInfo(foothold.idx).neutral_stance.inverse()); }
+  inline FootholdPtrArray getNeutralStance(const Foothold& foothold) const { return getNeutralStance(foothold.pose() * getFootInfo(foothold.idx).neutral_stance.inverse()); }
 
   inline bool isIndirectFoot(const FootIndex& foot_idx) const { return indirect_foot_idx_.find(foot_idx) != indirect_foot_idx_.end(); }
   inline const FootIndexSet& getIndirectFootIdx() const { return indirect_foot_idx_; }

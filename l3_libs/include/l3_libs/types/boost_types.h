@@ -41,7 +41,7 @@ namespace l3
 /*
  * Typedefs based on boost library
  */
-template<class T>
+template <class T>
 using SharedPtr = boost::shared_ptr<T>;
 
 template <class T, class... Args>
@@ -50,7 +50,7 @@ inline SharedPtr<T> makeShared(Args&&... args)
   return boost::make_shared<T>(boost::forward<Args>(args)...);
 }
 
-template<class T>
+template <class T>
 using UniquePtr = boost::movelib::unique_ptr<T>;
 
 template <class T, class... Args>
@@ -59,25 +59,34 @@ inline UniquePtr<T> makeUnique(Args&&... args)
   return boost::movelib::make_unique<T>(boost::forward<Args>(args)...);
 }
 
-template<class T1, class T2>
+template <class T1, class T2>
 inline SharedPtr<T1> staticPointerCast(const SharedPtr<T2>& p) noexcept
 {
   return boost::static_pointer_cast<T1>(p);
 }
 
-template<class T1, class T2>
+template <class T1, class T2>
 inline SharedPtr<T1> dynamicPointerCast(const SharedPtr<T2>& p) noexcept
 {
   return boost::dynamic_pointer_cast<T1>(p);
 }
 
-template<class T1, class T2>
+template <class T1, class T2>
 inline SharedPtr<T1> constPointerCast(const SharedPtr<T2>& p) noexcept
 {
   return boost::const_pointer_cast<T1>(p);
 }
 
+// SFINAE helper
+template <class T>
+struct is_shared_ptr : std::false_type
+{
+};
 
+template <class T>
+struct is_shared_ptr<SharedPtr<T>> : std::true_type
+{
+};
 
 using Mutex = boost::shared_mutex;
 
