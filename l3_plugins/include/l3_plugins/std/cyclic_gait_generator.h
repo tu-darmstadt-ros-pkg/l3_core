@@ -35,6 +35,25 @@
 
 namespace l3
 {
+/**
+ * @brief The CyclicGaitGenerator class generates cyclic gait as configured.
+ * Hereby, any combination of foot as well as floating base gaits can be used.
+ *
+ * Config:
+ * cycle:
+ * Foot cycle only
+ * case 1: [0, 1, 2, 3]        # (list) Single-leg cycle
+ * case 2: [[0, 2], [1, 3]]    # (list of list) Multi-leg cycle
+ *
+ * With floating base cycle
+ * case 3: [{fh: [0], fb: [0]}, {fh: [1, 2], fb: [0]}, ...]    # (list of dicts (of lists))
+ * or
+ * - {fh: 0}
+ * - {fb: 0}
+ * - {fh: 0, fb: 0}
+ * - {fh: [0], fb: [0]}
+ * - {fh: [1, 2], fb: [0]}
+ */
 class CyclicGaitGenerator : public GaitGeneratorPlugin
 {
   typedef std::map<ExpandStatesIdx, ExpandStatesIdx> LookupTable;
@@ -69,7 +88,8 @@ public:
   ExpandStatesIdxArray succMovingPatterns(Step::ConstPtr step, const ExpandStatesIdxArray& last_seq) const override;
 
 protected:
-  bool getCycleFromYaml(const std::string& key, ExpandStatesIdxArray& array);
+  bool getCycleFromYaml(const std::string& key, ExpandStatesIdxArray& cycle);
+  static void printCycle(const ExpandStatesIdxArray& cycle);
 
   ExpandStatesIdxArray cycle_;
   LookupTable succ_;
