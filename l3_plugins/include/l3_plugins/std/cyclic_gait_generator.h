@@ -89,7 +89,8 @@ public:
 
 protected:
   bool getCycleFromYaml(const std::string& key, ExpandStatesIdxArray& cycle);
-  static void printCycle(const ExpandStatesIdxArray& cycle);
+  static std::string toString(const ExpandStatesIdxArray& cycle);
+  static std::string toString(const ExpandStatesIdx& step);
 
   ExpandStatesIdxArray cycle_;
   LookupTable succ_;

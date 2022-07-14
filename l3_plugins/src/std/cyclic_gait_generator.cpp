@@ -41,7 +41,7 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
   }
 
   // output cycle
-  printCycle(cycle_);
+  ROS_INFO_STREAM("Cycle: " << toString(cycle_));
 
   // generate lookup table from given cycle as array
   for (size_t i = 0; i < cycle_.size(); i++)
@@ -100,7 +100,7 @@ ExpandStatesIdxArray CyclicGaitGenerator::predMovingPatterns(Step::ConstPtr /*st
     return ExpandStatesIdxArray{ itr->second };
   else
   {
-    ROS_WARN("[%s] No predecessor pattern defined! Fix it immediatly!", getName().c_str());
+    ROS_WARN("[%s] No predecessor pattern '%s' defined! Fix it immediatly!", getName().c_str(), toString(next).c_str());
     return ExpandStatesIdxArray();
   }
 }
@@ -121,7 +121,7 @@ ExpandStatesIdxArray CyclicGaitGenerator::succMovingPatterns(Step::ConstPtr /*st
     return ExpandStatesIdxArray{ itr->second };
   else
   {
-    ROS_WARN("[%s] No successor pattern defined! Fix it immediatly!", getName().c_str());
+    ROS_WARN("[%s] No successor for pattern '%s' defined! Fix it immediatly!", getName().c_str(), toString(last).c_str());
     return ExpandStatesIdxArray();
   }
 }
@@ -175,7 +175,7 @@ bool CyclicGaitGenerator::getCycleFromYaml(const std::string& key, ExpandStatesI
       if (p.getType() != XmlRpc::XmlRpcValue::TypeArray)
       {
         ROS_ERROR_NAMED(getName(), "[%s] Mulit-foot cycle requires each element to be a list. Element at index %lu is from type '%s'!", getName().c_str(), i,
-                        toString(p.getType()).c_str());
+                        l3::toString(p.getType()).c_str());
         return false;
       }
 
@@ -198,7 +198,7 @@ bool CyclicGaitGenerator::getCycleFromYaml(const std::string& key, ExpandStatesI
       if (p.getType() != XmlRpc::XmlRpcValue::TypeStruct)
       {
         ROS_ERROR_NAMED(getName(), "[%s] Floating base cycle requires each element to be a dict. Element at index %lu is from type '%s'!", getName().c_str(), i,
-                        toString(p.getType()).c_str());
+                        l3::toString(p.getType()).c_str());
         return false;
       }
 
@@ -273,29 +273,39 @@ bool CyclicGaitGenerator::getCycleFromYaml(const std::string& key, ExpandStatesI
   return true;
 }
 
-void CyclicGaitGenerator::printCycle(const ExpandStatesIdxArray& cycle)
+std::string CyclicGaitGenerator::toString(const ExpandStatesIdxArray& cycle)
 {
   std::stringstream ss;
-  for (const ExpandStatesIdx& arr : cycle)
-  {
-    ss << "[ ";
 
-    if (arr.foot_idx.empty())
-      ss << "- ";
-    for (const FootIndex& idx : arr.foot_idx)
-      ss << idx << " ";
+  for (const ExpandStatesIdx& step : cycle)
+    ss << toString(step) << " -> ";
 
-    ss << "| ";
-
-    if (arr.floating_base_idx.empty())
-      ss << "- ";
-    for (const BaseIndex& idx : arr.floating_base_idx)
-      ss << idx << " ";
-
-    ss << "] -> ";
-  }
   ss << "...";
-  ROS_INFO_STREAM("Cycle: " + ss.str());
+
+  return ss.str();
+}
+
+std::string CyclicGaitGenerator::toString(const ExpandStatesIdx& step)
+{
+  std::stringstream ss;
+
+  ss << "[ ";
+
+  if (step.foot_idx.empty())
+    ss << "- ";
+  for (const FootIndex& idx : step.foot_idx)
+    ss << idx << " ";
+
+  ss << "| ";
+
+  if (step.floating_base_idx.empty())
+    ss << "- ";
+  for (const BaseIndex& idx : step.floating_base_idx)
+    ss << idx << " ";
+
+  ss << "]";
+
+  return ss.str();
 }
 }  // namespace l3
 
