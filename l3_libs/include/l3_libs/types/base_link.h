@@ -137,7 +137,7 @@ struct BaseLink
   std::string toString() const
   {
     std::stringstream s;
-    s << std::setprecision(2) << std::fixed;
+    s << std::setprecision(3) << std::fixed;
     s << "(" << idx << ") ";
     s << x() << "/" << y() << "/" << z() << " - ";
     s << pitch() << "/" << roll() << "/" << yaw();
