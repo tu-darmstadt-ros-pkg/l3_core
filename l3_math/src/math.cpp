@@ -10,9 +10,12 @@ inline double wsin(double magnitude, double magnitude_shift, double sigmoid_dist
   return magnitude_shift + amplitude * (time - sigmoid_distortion_gain * sin(time));
 }
 
-int sign(double x){
-  if(x < 0) return -1;
-  else return 1;
+int sign(double x)
+{
+  if (x < 0)
+    return -1;
+  else
+    return 1;
 }
 
 double wsigmoid(double time, double period, double time_shift, double magnitude, double magnitude_shift, double sigmoid_ratio, double distortion_ratio)
@@ -98,6 +101,30 @@ Rotation getRotationZ(double angle)
   rotation << cos(angle), -sin(angle), 0.0, sin(angle), cos(angle), 0.0, 0.0, 0.0, 1.0;
 
   return rotation;
+}
+
+bool computeCircle(double dx, double dy, double& angle, double& radius)
+{
+  if (dy == 0.0)
+  {
+    angle = 0.0;
+    radius = std::numeric_limits<double>::infinity();
+    return false;
+  }
+  else
+  {
+    angle = computeCircleAngle(dx, dy);
+    radius = std::abs(dx / std::tan(angle) + dy);
+    return true;
+  }
+}
+
+double computeCircleAngle(double dx, double dy)
+{
+  if (dy == 0.0)
+    return 0.0;
+
+  return 2.0 * std::atan2(dy, dx);
 }
 
 double calcHeightOnPlane(const l3::Point& point, const l3::Point& p, const l3::Vector3& n) { return (n.x() * point.x() + n.y() * point.y() - p.dot(n)) / (-n.z()); }

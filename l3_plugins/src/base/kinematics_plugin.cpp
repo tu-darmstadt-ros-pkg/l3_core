@@ -16,7 +16,7 @@ bool KinematicsPlugin::loadParams(const vigir_generic_params::ParameterSet& para
   return true;
 }
 
-Transform KinematicsPlugin::calcFeetCenterToRoot(const Pose& feet_center, const FootholdArray& footholds) const
+Transform KinematicsPlugin::calcFeetCenterToRoot(const Pose& feet_center, const FootholdArray& /*footholds*/) const
 {
   if (leveled_base_)
     return Transform();
@@ -24,7 +24,7 @@ Transform KinematicsPlugin::calcFeetCenterToRoot(const Pose& feet_center, const 
     return Transform(0.0, 0.0, 0.0, feet_center.roll(), feet_center.pitch(), 0.0);
 }
 
-Transform KinematicsPlugin::calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& footholds) const
+Transform KinematicsPlugin::calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& /*footholds*/) const
 {
   if (leveled_base_)
     return Transform();

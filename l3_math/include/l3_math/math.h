@@ -108,6 +108,24 @@ inline T calcTriangleNormal(const T& p1, const T& p2, const T& p3)
 }
 
 /**
+ * @brief Computes curve parameters based on an assumed driven path (dx, dy) on a circle.
+ * @param dx Delta displacement in x direction
+ * @param dy Delta displacement in y direction, must be != 0.0
+ * @param angle [out] Heading of vehicle , assumed using ackermann based steering
+ * @param radius [out] Curve radius
+ * @return True, when parameters could be computed. Otherwise false.
+ */
+bool computeCircle(double dx, double dy, double& angle, double& radius);
+
+/**
+ * @brief Computes arc angle based on an assumed driven path (dx, dy) on a circle.
+ * @param dx Delta displacement in x direction
+ * @param dy Delta displacement in y direction
+ * @return arc angle, 0 when y = 0.0
+ */
+double computeCircleAngle(double dx, double dy);
+
+/**
  * @brief Determines z value on a plane defined by a point-normal pair for a given input point (x, y)
  * @param point Input point (x, y) to check
  * @param p point on plane

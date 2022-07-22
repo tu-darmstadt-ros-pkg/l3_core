@@ -152,7 +152,7 @@ bool CyclicGaitGenerator::getCycleFromYaml(const std::string& key, ExpandStatesI
   if (cycle_params.getType() != XmlRpc::XmlRpcValue::TypeArray)
     return false;
 
-  // detect structure of config
+  /// detect structure of config and generate pattern map
 
   // check if simple FootIndexArray is given
   if (cycle_params[0].getType() == XmlRpc::XmlRpcValue::TypeInt)
@@ -242,7 +242,7 @@ bool CyclicGaitGenerator::getCycleFromYaml(const std::string& key, ExpandStatesI
     return false;
   }
 
-  // consistency checks
+  /// consistency checks
   for (const ExpandStatesIdx& exp_idx : cycle)
   {
     for (const FootIndex& idx : exp_idx.foot_idx)
