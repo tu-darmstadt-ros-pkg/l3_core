@@ -21,20 +21,7 @@ bool KdlKinematics::loadParams(const vigir_generic_params::ParameterSet& params)
   if (!KinematicsPlugin::loadParams(params))
     return false;
 
-  // determine transform from center of feet (= calcFeetCenter in neutral stance) to root link
-  if (hasParam("center_to_root"))
-  {
-    XmlRpc::XmlRpcValue p = param("center_to_root", XmlRpc::XmlRpcValue());
-    if (!getYamlValue(p, center_to_root_))
-      ROS_ERROR("[%s] initialize: Failed to read 'center_to_root' parameter!", getName().c_str());
-  }
-
   getParam("ignore_foot_orientation", ignore_foot_orientation_, false, true);
-
-  /// TODO Build in switch
-  getParam("take_com_from_config", com_switch_, false, true);
-  // if(com_switch_)
-  // result &= getYamlValue(params, "com_from_base_frame", com_);
 
   return true;
 }
@@ -123,16 +110,6 @@ bool KdlKinematics::calcCenterOfMass(const std::string& frame_link, Vector3& com
   com.z() = sumOfCOM.z() / all_links_.size();
 
   return true;
-}
-
-Transform KdlKinematics::calcFeetCenterToRoot(const Pose& feet_center, const FootholdArray& footholds) const
-{
-  return KinematicsPlugin::calcFeetCenterToRoot(feet_center, footholds) * center_to_root_;
-}
-
-Transform KdlKinematics::calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& footholds) const
-{
-  return KinematicsPlugin::calcFeetCenterToRoot(feet_center, footholds) * center_to_root_;
 }
 
 bool KdlKinematics::calcStaticTransformForChain(const std::string& root_link, const std::string& tip_link, Transform& transform) const

@@ -62,11 +62,6 @@ public:
 
   bool calcCenterOfMass(const std::string& frame_link, Vector3& com) const override;
 
-  Transform calcStaticFeetCenterToRoot() const override { return center_to_root_; }
-
-  Transform calcFeetCenterToRoot(const Pose& feet_center, const FootholdArray& footholds) const override;
-  Transform calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& footholds) const override;
-
   bool calcStaticTransformForChain(const std::string& root_link, const std::string& tip_link, Transform& transform) const override;
 
   bool calcForwardKinematicsForChain(const std::string& root_link, const std::string& tip_link, const std::vector<double>& q, Pose& result) const override;
@@ -85,7 +80,6 @@ private:
   KDL::Tree tree_;
 
   // parameters
-  Transform center_to_root_;  // transformation from geometric center of feet to root link
   bool ignore_foot_orientation_;
 };
 }  // namespace l3

@@ -83,20 +83,22 @@ public:
   //}
 
   /**
-   * @brief Determines the static transform from the feet center to the root link based on neutral stance.
+   * @brief Determines the static transform from the geometric feet center to the root link based on neutral stance.
+   * @param description RobotDescription
    * @return static transfrom from geometric feet center to root link
    */
-  virtual Transform calcStaticFeetCenterToRoot() const { return Transform(); }
+  virtual Transform calcStaticFeetCenterToRoot(const RobotDescription& description) const;
 
   /**
    * @brief Determines the transform from the feet center of the given robot configuration
    * to the root link.
+   * @param description RobotDescription
    * @param feet_center feet center
    * @param footholds foothold configuration
    * @return transform from given feet center to root link
    */
-  virtual Transform calcFeetCenterToRoot(const Pose& feet_center, const FootholdArray& footholds) const;
-  virtual Transform calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& footholds) const;
+  virtual Transform calcFeetCenterToRoot(const RobotDescription& description, const Pose& feet_center, const FootholdArray& footholds) const;
+  virtual Transform calcFeetCenterToRoot(const RobotDescription& description, const Pose& feet_center, const FootholdConstPtrArray& footholds) const;
   /// If upper variant is overloaded, one should use following code snippet for sake of simplicity (calling overloaded calcFeetCenterToRoot)
   // Transform calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& footholds) const override
   //{
@@ -107,14 +109,14 @@ public:
   //}
 
   /**
-   * @brief Determines the static transform from the feet center to the robot base based on neutral stance.
+   * @brief Determines the static transform from the geometric feet center to the robot base based on neutral stance.
    * @param description RobotDescription
    * @return static transfrom from geometric feet center to base link
    */
   virtual Transform calcStaticFeetCenterToBase(const RobotDescription& description) const;
 
   /**
-   * @brief Determines the transform from the feet center of the given robot configuration
+   * @brief Determines the transform from the geometric feet center of the given robot configuration
    * to the robot base. Useful for use with calcLegIK(...).
    * @param description RobotDescription
    * @param feet_center feet center
@@ -123,6 +125,8 @@ public:
    */
   virtual Transform calcFeetCenterToBase(const RobotDescription& description, const Pose& feet_center, const FootholdArray& footholds) const;
   virtual Transform calcFeetCenterToBase(const RobotDescription& description, const Pose& feet_center, const FootholdConstPtrArray& footholds) const;
+
+  virtual Transform calcBaseToRoot(const RobotDescription& description) const;
 
   virtual bool calcStaticTransformForChain(const std::string& root_link, const std::string& tip_link, Transform& transform) const { return false; }
 
@@ -137,7 +141,8 @@ public:
    * @param q list of joint configurations in the range [-PI; PI]. Joints are given in the same order as occuring from root to tip link.
    * @return true if valid solution was found
    */
-  virtual bool calcInverseKinematicsForChain(const std::string& root_link, const std::string& tip_link, const Pose& goal, const std::vector<double>& curr_q, std::vector<double>& q) const
+  virtual bool calcInverseKinematicsForChain(const std::string& root_link, const std::string& tip_link, const Pose& goal, const std::vector<double>& curr_q,
+                                             std::vector<double>& q) const
   {
     return false;
   }
@@ -186,10 +191,7 @@ public:
 protected:
   std::string root_link_;  // root link of chain
 
-  bool leveled_base_; // indicates if base is leveled (base center is over feet center)
-
-  bool com_switch_;
-  Vector3 com_;
+  bool leveled_base_;  // indicates if base is leveled (base center is over feet center)
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
