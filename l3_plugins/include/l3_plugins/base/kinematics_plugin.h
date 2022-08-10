@@ -117,9 +117,10 @@ public:
 
   /**
    * @brief Determines the transform from the geometric feet center of the given robot configuration
-   * to the robot base. Useful for use with calcLegIK(...).
+   * to the robot base. Useful for use with calcLegIK(...). The given feet center is only used to determine
+   * base leveling (roll, pitch).
    * @param description RobotDescription
-   * @param feet_center feet center
+   * @param feet_center feet center from which the base leveling (roll, pitch) is determined
    * @param footholds foothold configuration
    * @return transfrom from geometric feet center to base link
    */
