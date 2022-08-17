@@ -90,13 +90,13 @@ inline visualization_msgs::Marker baseToBaseMarker(const l3_msgs::FloatingBase& 
 visualization_msgs::MarkerArray feetToFootMarkerArray(const l3_msgs::FootholdArray& feet, const RobotDescription& robot_description, const std_msgs::ColorRGBA& color, const std::string& ns = "foot");
 visualization_msgs::MarkerArray feetToFootMarkerArray(const l3_msgs::FootholdArray& feet, const RobotDescription& robot_description, const std::string& ns = "foot");
 
-inline visualization_msgs::Marker stepDataToFootMarker(const l3_msgs::StepData& step, const RobotDescription& robot_description, const std_msgs::ColorRGBA& color, const std::string& ns = "foot")
+inline visualization_msgs::Marker footStepDataToFootMarker(const l3_msgs::FootStepData& step, const RobotDescription& robot_description, const std_msgs::ColorRGBA& color, const std::string& ns = "foot")
 
 {
   return footToFootMarker(step.target, robot_description, color, ns);
 }
 
-inline visualization_msgs::Marker stepDataToFootMarker(const l3_msgs::StepData& step, const RobotDescription& robot_description, const std::string& ns = "foot")
+inline visualization_msgs::Marker footStepDataToFootMarker(const l3_msgs::FootStepData& step, const RobotDescription& robot_description, const std::string& ns = "foot")
 {
   return footToFootMarker(step.target, robot_description, ns);
 }

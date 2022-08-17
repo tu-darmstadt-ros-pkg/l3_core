@@ -3,15 +3,13 @@
 namespace l3
 {
 StepFeedbackData::StepFeedbackData()
-  : StepData()
-  , changeable(false)
+  : changeable(false)
   , executing(false)
   , finished(false)
 {}
 
-StepFeedbackData::StepFeedbackData(const StepData& other)
-  : StepData(other)
-  , changeable(false)
+StepFeedbackData::StepFeedbackData(const FootStepData& other)
+  : changeable(false)
   , executing(false)
   , finished(false)
 {}
@@ -25,7 +23,8 @@ void StepFeedbackData::reset()
 
 void StepFeedbackData::fromMsg(const l3_msgs::StepFeedbackData& msg)
 {
-  StepData::fromMsg(msg.step_data);
+  foot_step.fromMsg(msg.foot_step);
+  base_step.fromMsg(msg.base_step);
   changeable = msg.changeable;
   executing = msg.executing;
   finished = msg.finished;
@@ -35,7 +34,8 @@ void StepFeedbackData::fromMsg(const l3_msgs::StepFeedbackData& msg)
 
 void StepFeedbackData::toMsg(l3_msgs::StepFeedbackData& msg) const
 {
-  StepData::toMsg(msg.step_data);
+  foot_step.toMsg(msg.foot_step);
+  base_step.toMsg(msg.base_step);
   msg.changeable = changeable;
   msg.executing = executing;
   msg.finished = finished;

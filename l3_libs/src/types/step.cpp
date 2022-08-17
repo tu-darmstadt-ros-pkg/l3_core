@@ -6,11 +6,11 @@ void Step::fromMsg(const l3_msgs::Step& msg)
 {
   clear();
 
-  for (const l3_msgs::StepData& s : msg.step_data)
-    step_data_map_[s.origin.idx].reset(new StepData(s));
+  for (const l3_msgs::FootStepData& s : msg.foot_steps)
+    step_data_map_[s.origin.idx].reset(new FootStepData(s));
 
-  for (const l3_msgs::Foothold& fh : msg.support)
-    support_[fh.idx].reset(new Foothold(fh));
+  for (const l3_msgs::Foothold& fh : msg.support_feet)
+    support_feet_[fh.idx].reset(new Foothold(fh));
 
   for (const l3_msgs::BaseStepData& s : msg.moving_bases)
     moving_bases_map_[s.origin.idx].reset(new BaseStepData(s));
@@ -25,13 +25,13 @@ void Step::fromMsg(const l3_msgs::Step& msg)
 
 void Step::toMsg(l3_msgs::Step& msg) const
 {
-  msg.step_data.clear();
+  msg.foot_steps.clear();
   for (const StepDataPair& p : step_data_map_)
-    msg.step_data.push_back(p.second->toMsg());
+    msg.foot_steps.push_back(p.second->toMsg());
 
-  msg.support.clear();
-  for (const FootholdConstPtrPair& p : support_)
-    msg.support.push_back(p.second->toMsg());
+  msg.support_feet.clear();
+  for (const FootholdConstPtrPair& p : support_feet_)
+    msg.support_feet.push_back(p.second->toMsg());
 
   msg.moving_bases.clear();
   for (const BaseStepDataPair& p : moving_bases_map_)
@@ -55,8 +55,8 @@ l3_msgs::Step Step::toMsg() const
 
 void Step::clear()
 {
-  BaseStep<StepData::Ptr>::clear();
-  support_.clear();
+  BaseStep<FootStepData::Ptr>::clear();
+  support_feet_.clear();
   moving_bases_map_.clear();
   resting_bases_map_.clear();
 }
@@ -78,12 +78,12 @@ Step& Step::transform(const Transform& transform, const std_msgs::Header& header
   }
 
   // transform support footholds
-  for (FootholdConstPtrPair p : support_)
+  for (FootholdConstPtrPair p : support_feet_)
   {
     Foothold fh = p.second->transform(transform);
     if (!header.frame_id.empty())
       fh.header = header;
-    support_[p.first].reset(new Foothold(fh));
+    support_feet_[p.first].reset(new Foothold(fh));
     // p.second.reset(new Foothold(f));
   }
 
@@ -120,7 +120,7 @@ FootholdConstPtrArray Step::getFootholds() const
   for (const StepDataPair& p : step_data_map_)
     footholds.push_back(p.second->target);
 
-  for (const FootholdConstPtrPair& p : getSupportMap())
+  for (const FootholdConstPtrPair& p : getSupportFootMap())
     footholds.push_back(p.second);
 
   return footholds;
@@ -128,11 +128,11 @@ FootholdConstPtrArray Step::getFootholds() const
 
 Foothold::ConstPtr Step::getFoothold(const FootIndex& foot_idx) const
 {
-  StepData::ConstPtr step_data = getStepData(foot_idx);
+  FootStepData::ConstPtr step_data = getStepData(foot_idx);
   if (step_data)
     return step_data->target;
 
-  return getSupport(foot_idx);
+  return getSupportFoot(foot_idx);
 }
 
 FloatingBaseConstPtrArray Step::getFloatingBases() const

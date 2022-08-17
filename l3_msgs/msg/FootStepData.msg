@@ -1,7 +1,7 @@
 l3_msgs/Foothold origin
 l3_msgs/Foothold target
 
-# step delta
+# foothold delta
 float64 dx
 float64 dy
 float64 dz

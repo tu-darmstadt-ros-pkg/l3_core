@@ -50,16 +50,16 @@ public:
 
   StepFeedback()
     : BaseStep()
-    , changeable(false)
-    , executing(false)
-    , finished(false)
+    , changeable_(false)
+    , executing_(false)
+    , finished_(false)
   {}
 
   StepFeedback(const StepIndex& idx)
     : BaseStep(idx)
-    , changeable(false)
-    , executing(false)
-    , finished(false)
+    , changeable_(false)
+    , executing_(false)
+    , finished_(false)
   {}
 
   void reset();
@@ -92,9 +92,9 @@ public:
   inline double stepDuration() const { return (latestExecutionEnd() - firstExecutionStart()).toSec(); }
 
 private:
-  bool changeable;
-  bool executing;
-  bool finished;
+  bool changeable_;
+  bool executing_;
+  bool finished_;
 };
 
 typedef std::vector<StepFeedback> StepFeedbackArray;

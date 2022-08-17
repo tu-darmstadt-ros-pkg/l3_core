@@ -32,6 +32,7 @@ add_message_files(
   DampingControlParams.msg
   PIDControlGains.msg
   FootInfo.msg
+  FootStepData.msg
   FloatingBase.msg
   Foothold.msg
   RobotDescription.msg
@@ -40,7 +41,6 @@ add_message_files(
   StepFeedback.msg
   StepFeedbackData.msg
   StepFeedbackQueue.msg
-  StepData.msg
   BaseStepData.msg
   StepQueue.msg
   LegInfo.msg

@@ -32,8 +32,8 @@
 #include <l3_msgs/Step.h>
 
 #include <l3_libs/types/base_step.h>
-#include <l3_libs/types/step_data.h>
 #include <l3_libs/types/base_step_data.h>
+#include <l3_libs/types/foot_step_data.h>
 
 namespace l3
 {
@@ -81,7 +81,7 @@ typedef std::vector<ExpandStatesIdx> ExpandStatesIdxArray;
  * A step is the collection of all moving and supporting feet. For all
  * moving feet the corresponding transition is stored as StepData.
  */
-class Step : public BaseStep<StepData::Ptr>
+class Step : public BaseStep<FootStepData::Ptr>
 {
 public:
   // typedefs
@@ -120,7 +120,7 @@ public:
    * @brief Checks if any step data, support footholds or floating base are available.
    * @return False, if neither step data nor support footholds nor floating base are available.
    */
-  bool empty() const override { return BaseStep<StepData::Ptr>::empty() && support_.empty() && moving_bases_map_.empty() && resting_bases_map_.empty(); }
+  bool empty() const override { return BaseStep<FootStepData::Ptr>::empty() && support_feet_.empty() && moving_bases_map_.empty() && resting_bases_map_.empty(); }
 
   inline Step& transform(const tf::Transform transform, const std_msgs::Header& header = std_msgs::Header()) { return this->transform(Transform(transform), header); }
   Step& transform(const Transform& transform, const std_msgs::Header& header = std_msgs::Header());
@@ -154,26 +154,26 @@ public:
   /**
    * @brief Clears list of support footholds
    */
-  inline void clearSupport() { support_.clear(); }
+  inline void clearSupportFeet() { support_feet_.clear(); }
 
   /**
    * @brief Returns number of supporting footholds
    * @return Number of supporting footholds
    */
-  inline size_t supportSize() const { return support_.size(); }
+  inline size_t supportFeetSize() const { return support_feet_.size(); }
 
   /**
    * @brief Checks if support footholds are available
    * @return True, if support footholds are available
    */
-  inline bool hasSupport() const { return !support_.empty(); }
-  inline bool hasSupport(const FootIndex& foot_idx) const { return support_.find(foot_idx) != support_.end(); }
+  inline bool hasSupportFoot() const { return !support_feet_.empty(); }
+  inline bool hasSupportFoot(const FootIndex& foot_idx) const { return support_feet_.find(foot_idx) != support_feet_.end(); }
 
   /**
    * @brief Updates support footholds by given input
    * @param foothold support foothold to be updated
    */
-  void updateSupport(Foothold::ConstPtr foothold) { support_[foothold->idx] = foothold; }
+  void updateSupportFoot(Foothold::ConstPtr foothold) { support_feet_[foothold->idx] = foothold; }
 
   /**
    * @brief Tries to return support foothold for given foot index.
@@ -181,11 +181,11 @@ public:
    * @return Supporting foothold. If no entry was found for given input foothold index,
    * a null pointer is returned.
    */
-  Foothold::ConstPtr getSupport(const FootIndex& foot_idx) const
+  Foothold::ConstPtr getSupportFoot(const FootIndex& foot_idx) const
   {
     Foothold::ConstPtr foothold;
-    FootholdConstPtrMap::const_iterator itr = support_.find(foot_idx);
-    if (itr != support_.end())
+    FootholdConstPtrMap::const_iterator itr = support_feet_.find(foot_idx);
+    if (itr != support_feet_.end())
       foothold = itr->second;
 
     return foothold;
@@ -195,14 +195,14 @@ public:
    * @brief Exposes the internal support foothold map
    * @return Internal support foothold map
    */
-  inline const FootholdConstPtrMap& getSupportMap() const { return support_; }
-  inline FootholdConstPtrMap& getSupportMap() { return support_; }
+  inline const FootholdConstPtrMap& getSupportFootMap() const { return support_feet_; }
+  inline FootholdConstPtrMap& getSupportFootMap() { return support_feet_; }
 
   /**
    * @brief Returns list of all foot indeces represented by all support footholds
    * @return List of foot indeces
    */
-  inline FootIndexArray getSupportFootIndeces() const { return keysAsArray<FootIndexArray>(support_); }
+  inline FootIndexArray getSupportFootIndeces() const { return keysAsArray<FootIndexArray>(support_feet_); }
 
   /**
    * @brief Clears internally all base step data
@@ -311,7 +311,7 @@ public:
   inline BaseIndexArray getRestingFloatingBaseIndeces() const { return keysAsArray<BaseIndexArray>(resting_bases_map_); }
 
 private:
-  FootholdConstPtrMap support_;  // map of stored foothold data
+  FootholdConstPtrMap support_feet_;  // map of stored foothold data
 
   BaseStepDataMap moving_bases_map_;           // floating base step data
   FloatingBaseConstPtrMap resting_bases_map_;  // floating base support position

@@ -1,7 +1,7 @@
 l3_msgs/FloatingBase origin
 l3_msgs/FloatingBase target
 
-# base step delta
+# floating base delta
 float64 dx
 float64 dy
 float64 dz

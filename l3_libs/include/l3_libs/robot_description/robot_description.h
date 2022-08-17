@@ -36,7 +36,6 @@
 #include <l3_libs/robot_description/base_info.h>
 #include <l3_libs/robot_description/foot_info.h>
 #include <l3_libs/robot_description/leg_info.h>
-#include <l3_libs/types/step_data.h>
 
 namespace l3
 {

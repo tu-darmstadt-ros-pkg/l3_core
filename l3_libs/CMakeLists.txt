@@ -125,8 +125,8 @@ set(HEADERS
   include/${PROJECT_NAME}/types/stdlib_types.h
   include/${PROJECT_NAME}/types/variant_data_macros.h
   include/${PROJECT_NAME}/types/step.h
-  include/${PROJECT_NAME}/types/step_data.h
   include/${PROJECT_NAME}/types/base_step_data.h
+  include/${PROJECT_NAME}/types/foot_step_data.h
   include/${PROJECT_NAME}/types/step_feedback.h
   include/${PROJECT_NAME}/types/step_feedback_data.h
   include/${PROJECT_NAME}/types/step_feedback_queue.h
@@ -159,8 +159,8 @@ set(SOURCES
   src/types/foothold.cpp
   src/types/joint_states.cpp
   src/types/step.cpp
-  src/types/step_data.cpp
   src/types/base_step_data.cpp
+  src/types/foot_step_data.cpp
   src/types/step_queue.cpp
   src/types/step_feedback.cpp
   src/types/step_feedback_data.cpp

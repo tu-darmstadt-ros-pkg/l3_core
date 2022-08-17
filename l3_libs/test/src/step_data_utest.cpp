@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <l3_libs/test_macros.h>
-#include <l3_libs/types/step_data.h>
+#include <l3_libs/types/foot_step_data.h>
 #include <l3_libs/types/floating_base.h>
 
 using namespace l3;

@@ -201,9 +201,9 @@ visualization_msgs::MarkerArray stepToFootMarkerArray(const l3_msgs::Step& step,
   visualization_msgs::Marker marker;
   visualization_msgs::MarkerArray markers;
 
-  for (const l3_msgs::StepData& step_data : step.step_data)
+  for (const l3_msgs::FootStepData& foot_step : step.foot_steps)
   {
-    marker = stepDataToFootMarker(step_data, robot_description, color, ns);
+    marker = footStepDataToFootMarker(foot_step, robot_description, color, ns);
     marker.id = static_cast<int>(markers.markers.size());
     markers.markers.push_back(marker);
   }
@@ -216,9 +216,9 @@ visualization_msgs::MarkerArray stepToFootMarkerArray(const l3_msgs::Step& step,
   visualization_msgs::Marker marker;
   visualization_msgs::MarkerArray markers;
 
-  for (const l3_msgs::StepData& step_data : step.step_data)
+  for (const l3_msgs::FootStepData& foot_step : step.foot_steps)
   {
-    marker = stepDataToFootMarker(step_data, robot_description, ns);
+    marker = footStepDataToFootMarker(foot_step, robot_description, ns);
     marker.id = static_cast<int>(markers.markers.size());
     markers.markers.push_back(marker);
   }
@@ -236,14 +236,14 @@ visualization_msgs::MarkerArray stepPlanToFootMarkerArray(const l3_msgs::StepArr
     l3_msgs::FootholdArray footholds;
 
     // check if step data is available for visualization, otherwise use supporting legs
-    if (step.step_data.empty())
+    if (step.foot_steps.empty())
     {
-      footholds = step.support;
+      footholds = step.support_feet;
     }
     else
     {
-      for (const l3_msgs::StepData& step_data : step.step_data)
-        footholds.push_back(step_data.target);
+      for (const l3_msgs::FootStepData& foot_step : step.foot_steps)
+        footholds.push_back(foot_step.target);
     }
 
     // handle footholds
@@ -368,8 +368,8 @@ visualization_msgs::MarkerArray stepPlanToUpperBodyMarkerArray(const l3_msgs::Fo
   for (const l3_msgs::Step& step : steps)
   {
     // update robot state
-    for (const l3_msgs::StepData& step_data : step.step_data)
-      feet_map[step_data.target.idx] = step_data.target;
+    for (const l3_msgs::FootStepData& foot_step : step.foot_steps)
+      feet_map[foot_step.target.idx] = foot_step.target;
 
     // extract current footholds
     l3_msgs::FootholdArray feet;

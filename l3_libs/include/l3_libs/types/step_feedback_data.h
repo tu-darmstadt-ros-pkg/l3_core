@@ -31,7 +31,8 @@
 
 #include <l3_msgs/StepFeedbackData.h>
 
-#include <l3_libs/types/step_data.h>
+#include <l3_libs/types/base_step_data.h>
+#include <l3_libs/types/foot_step_data.h>
 
 namespace l3
 {
@@ -39,14 +40,14 @@ namespace l3
  * @brief More detailed step data information including low-level walking data.
  * This structure describes the execution result of the transition between two footholds (=step).
  */
-struct StepFeedbackData : public StepData
+struct StepFeedbackData
 {
   // typedefs
   typedef SharedPtr<StepFeedbackData> Ptr;
   typedef SharedPtr<const StepFeedbackData> ConstPtr;
 
   StepFeedbackData();
-  StepFeedbackData(const StepData& other);
+  StepFeedbackData(const FootStepData& other);
 
   void reset();
 
@@ -56,6 +57,9 @@ struct StepFeedbackData : public StepData
 
   void toMsg(l3_msgs::StepFeedbackData& msg) const;
   l3_msgs::StepFeedbackData toMsg() const;
+
+  FootStepData foot_step;
+  BaseStepData base_step;
 
   bool changeable;  // indicates if step can still be changed
   bool executing;   // indicates if step is currently executed

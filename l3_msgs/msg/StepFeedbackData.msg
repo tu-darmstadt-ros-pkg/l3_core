@@ -1,4 +1,5 @@
-l3_msgs/StepData step_data
+l3_msgs/FootStepData foot_step
+l3_msgs/BaseStepData base_step
 
 bool changeable            # indicates if step can still be changed
 bool executing             # indicates if step is currently executed

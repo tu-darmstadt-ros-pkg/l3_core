@@ -31,27 +31,53 @@
 
 #include <ros/ros.h>
 
+#include <l3_msgs/BaseStepData.h>
+#include <l3_msgs/FootStepData.h>
 #include <l3_msgs/Step.h>
-#include <l3_msgs/StepData.h>
 #include <l3_msgs/StepQueue.h>
 
+#include <l3_libs/types/base_step_data.h>
+#include <l3_libs/types/foot_step_data.h>
 #include <l3_libs/types/step.h>
-#include <l3_libs/types/step_data.h>
 #include <l3_libs/types/step_queue.h>
 
 namespace l3
 {
 /// Converts a Step message into a l3 StepData
-inline void stepDataMsgToL3(const l3_msgs::StepData& msg, l3::StepData& step_data) { step_data.fromMsg(msg); }
+inline void footStepDataMsgToL3(const l3_msgs::FootStepData& msg, l3::FootStepData& step_data) { step_data.fromMsg(msg); }
 
 /// Converts a l3 StepData into a Step Data message
-inline void stepDataL3ToMsg(const l3::StepData& step_data, l3_msgs::StepData& msg) { step_data.toMsg(msg); }
+inline void footStepDataL3ToMsg(const l3::FootStepData& step_data, l3_msgs::FootStepData& msg) { step_data.toMsg(msg); }
+
+/// Converts a StepDataArray message into a StepDataArray
+void footStepDataArrayMsgToL3(const l3_msgs::FootStepDataArray& msg, l3::FootStepDataArray& step_data);
+
+/// Converts a StepDataArray into a StepDataArray message
+void footStepDataArrayL3ToMsg(const l3::FootStepDataArray& step_data, l3_msgs::FootStepDataArray& msg);
+
+/// Converts a StepDataPtrArray into a StepDataArray message
+void footStepDataArrayL3ToMsg(l3::FootStepDataPtrArray step_data, l3_msgs::FootStepDataArray& msg);
+
+/// Converts a StepDataConstPtrArray into a StepDataArray message
+void footStepDataArrayL3ToMsg(l3::FootStepDataConstPtrArray step_data, l3_msgs::FootStepDataArray& msg);
 
 /// Converts a Base Step Data message into a l3 BaseStepData
 inline void baseStepDataMsgToL3(const l3_msgs::BaseStepData& msg, l3::BaseStepData& base_step_data) { base_step_data.fromMsg(msg); }
 
 /// Converts a l3 BaseStepData into a Base Step Data message
 inline void baseStepDataL3ToMsg(const l3::BaseStepData& base_step_data, l3_msgs::BaseStepData& msg) { base_step_data.toMsg(msg); }
+
+/// Converts a StepDataArray message into a StepDataArray
+void baseStepDataArrayMsgToL3(const l3_msgs::BaseStepDataArray& msg, l3::BaseStepDataArray& base_step_data);
+
+/// Converts a StepDataArray into a StepDataArray message
+void baseStepDataArrayL3ToMsg(const l3::BaseStepDataArray& base_step_data, l3_msgs::BaseStepDataArray& msg);
+
+/// Converts a StepDataPtrArray into a StepDataArray message
+void baseStepDataArrayL3ToMsg(l3::BaseStepDataPtrArray base_step_data, l3_msgs::BaseStepDataArray& msg);
+
+/// Converts a StepDataConstPtrArray into a StepDataArray message
+void baseStepDataArrayL3ToMsg(l3::BaseStepDataConstPtrArray base_step_data, l3_msgs::BaseStepDataArray& msg);
 
 /// Converts a Step message into a l3 Step
 inline void stepMsgToL3(const l3_msgs::Step& msg, l3::Step& step) { step.fromMsg(msg); }
@@ -64,18 +90,6 @@ inline void stepQueueMsgToL3(const l3_msgs::StepQueue& msg, l3::StepQueue& step_
 
 /// Converts a l3 StepQueue into a StepQueue message
 inline void stepQueueL3ToMsg(const l3::StepQueue& step_queue, l3_msgs::StepQueue& msg) { step_queue.toMsg(msg); }
-
-/// Converts a StepDataArray message into a StepDataArray
-void stepDataArrayMsgToL3(const l3_msgs::StepDataArray& msg, l3::StepDataArray& step_data);
-
-/// Converts a StepDataArray into a StepDataArray message
-void stepDataArrayL3ToMsg(const l3::StepDataArray& step_data, l3_msgs::StepDataArray& msg);
-
-/// Converts a StepDataPtrArray into a StepDataArray message
-void stepDataArrayL3ToMsg(l3::StepDataPtrArray step_data, l3_msgs::StepDataArray& msg);
-
-/// Converts a StepDataConstPtrArray into a StepDataArray message
-void stepDataArrayL3ToMsg(l3::StepDataConstPtrArray step_data, l3_msgs::StepDataArray& msg);
 
 /// Converts a StepArray message into a StepArray
 void stepArrayMsgToL3(const l3_msgs::StepArray& msg, l3::StepArray& steps);

@@ -13,7 +13,7 @@ void StepFeedback::fromMsg(const l3_msgs::StepFeedback& msg)
   clear();
 
   for (const l3_msgs::StepFeedbackData& s : msg.step_feedback_data)
-    step_data_map_[s.step_data.origin.idx].reset(new StepFeedbackData(s));
+    step_data_map_[s.foot_step.origin.idx].reset(new StepFeedbackData(s));
   idx_ = msg.idx;
 
   variantDataSetMsgToL3(msg.data, data);
@@ -40,15 +40,15 @@ l3_msgs::StepFeedback StepFeedback::toMsg() const
 void StepFeedback::clear()
 {
   BaseStep<StepFeedbackData::Ptr>::clear();
-  changeable = false;
-  executing = false;
-  finished = false;
+  changeable_ = false;
+  executing_ = false;
+  finished_ = false;
 }
 
 bool StepFeedback::isChangeable() const
 {
   if (step_data_map_.empty())
-    return changeable;
+    return changeable_;
 
   for (const StepDataPair& p : step_data_map_)
   {
@@ -61,7 +61,7 @@ bool StepFeedback::isChangeable() const
 bool StepFeedback::isExecuting() const
 {
   if (step_data_map_.empty())
-    return executing;
+    return executing_;
 
   for (const StepDataPair& p : step_data_map_)
   {
@@ -74,7 +74,7 @@ bool StepFeedback::isExecuting() const
 bool StepFeedback::isFinished() const
 {
   if (step_data_map_.empty())
-    return finished;
+    return finished_;
 
   for (const StepDataPair& p : step_data_map_)
   {
@@ -88,9 +88,9 @@ void StepFeedback::setChangeable()
 {
   if (step_data_map_.empty())
   {
-    changeable = true;
-    executing = false;
-    finished = false;
+    changeable_ = true;
+    executing_ = false;
+    finished_ = false;
   }
 
   for (StepDataPair& p : step_data_map_)
@@ -105,9 +105,9 @@ void StepFeedback::setExecuting()
 {
   if (step_data_map_.empty())
   {
-    changeable = false;
-    executing = true;
-    finished = false;
+    changeable_ = false;
+    executing_ = true;
+    finished_ = false;
   }
 
   for (StepDataPair& p : step_data_map_)
@@ -122,9 +122,9 @@ void StepFeedback::setFinished()
 {
   if (step_data_map_.empty())
   {
-    changeable = false;
-    executing = false;
-    finished = true;
+    changeable_ = false;
+    executing_ = false;
+    finished_ = true;
   }
 
   for (StepDataPair& p : step_data_map_)

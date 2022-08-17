@@ -1,8 +1,8 @@
-#include <l3_libs/types/step_data.h>
+#include <l3_libs/types/foot_step_data.h>
 
 namespace l3
 {
-StepData::StepData()
+FootStepData::FootStepData()
   : origin(new Foothold())
   , target(new Foothold())
   , dx(0.0)
@@ -16,7 +16,7 @@ StepData::StepData()
   , swing_height(0.0)
 {}
 
-StepData::StepData(const Foothold::ConstPtr origin, const Foothold::ConstPtr target, const Transform delta, double sway_duration, double step_duration, double swing_height)
+FootStepData::FootStepData(const Foothold::ConstPtr origin, const Foothold::ConstPtr target, const Transform delta, double sway_duration, double step_duration, double swing_height)
   : origin(origin)
   , target(target)
   , dx(delta.x())
@@ -35,7 +35,7 @@ StepData::StepData(const Foothold::ConstPtr origin, const Foothold::ConstPtr tar
     ROS_ERROR("[StepData] Origin and Target FootIndex mismatch! Fix it immediately!");
 }
 
-void StepData::fromMsg(const l3_msgs::StepData& msg)
+void FootStepData::fromMsg(const l3_msgs::FootStepData& msg)
 {
   origin.reset(new Foothold(msg.origin));
   target.reset(new Foothold(msg.target));
@@ -57,7 +57,7 @@ void StepData::fromMsg(const l3_msgs::StepData& msg)
   variantDataSetMsgToL3(msg.data, data);
 }
 
-void StepData::toMsg(l3_msgs::StepData& msg) const
+void FootStepData::toMsg(l3_msgs::FootStepData& msg) const
 {
   if (origin)
     origin->toMsg(msg.origin);
@@ -78,14 +78,14 @@ void StepData::toMsg(l3_msgs::StepData& msg) const
   variantDataSetL3ToMsg(data, msg.data);
 }
 
-l3_msgs::StepData StepData::toMsg() const
+l3_msgs::FootStepData FootStepData::toMsg() const
 {
-  l3_msgs::StepData msg;
+  l3_msgs::FootStepData msg;
   toMsg(msg);
   return msg;
 }
 
-std::string StepData::toString() const
+std::string FootStepData::toString() const
 {
   std::stringstream s;
   s << std::setprecision(2) << std::fixed;

@@ -2,31 +2,59 @@
 
 namespace l3
 {
-void stepDataArrayMsgToL3(const l3_msgs::StepDataArray& msg, l3::StepDataArray& step_data)
+void footStepDataArrayMsgToL3(const l3_msgs::FootStepDataArray& msg, l3::FootStepDataArray& foot_step_data)
 {
-  step_data.clear();
-  for (const l3_msgs::StepData& s : msg)
-    step_data.push_back(l3::StepData(s));
+  foot_step_data.clear();
+  for (const l3_msgs::FootStepData& s : msg)
+    foot_step_data.push_back(l3::FootStepData(s));
 }
 
-void stepDataArrayL3ToMsg(const l3::StepDataArray& step_data, l3_msgs::StepDataArray& msg)
+void footStepDataArrayL3ToMsg(const l3::FootStepDataArray& foot_step_data, l3_msgs::FootStepDataArray& msg)
 {
   msg.clear();
-  for (const l3::StepData& s : step_data)
+  for (const l3::FootStepData& s : foot_step_data)
     msg.push_back(s.toMsg());
 }
 
-void stepDataArrayL3ToMsg(l3::StepDataPtrArray step_data, l3_msgs::StepDataArray& msg)
+void footStepDataArrayL3ToMsg(l3::FootStepDataPtrArray foot_step_data, l3_msgs::FootStepDataArray& msg)
 {
   msg.clear();
-  for (l3::StepData::ConstPtr s : step_data)
+  for (l3::FootStepData::ConstPtr s : foot_step_data)
     msg.push_back(s->toMsg());
 }
 
-void stepDataArrayL3ToMsg(l3::StepDataConstPtrArray step_data, l3_msgs::StepDataArray& msg)
+void footStepDataArrayL3ToMsg(l3::FootStepDataConstPtrArray foot_step_data, l3_msgs::FootStepDataArray& msg)
 {
   msg.clear();
-  for (l3::StepData::ConstPtr s : step_data)
+  for (l3::FootStepData::ConstPtr s : foot_step_data)
+    msg.push_back(s->toMsg());
+}
+
+void baseStepDataArrayMsgToL3(const l3_msgs::BaseStepDataArray& msg, l3::BaseStepDataArray& base_step_data)
+{
+  base_step_data.clear();
+  for (const l3_msgs::BaseStepData& s : msg)
+    base_step_data.push_back(l3::BaseStepData(s));
+}
+
+void baseStepDataArrayMsgToL3(const l3::BaseStepDataArray& base_step_data, l3_msgs::BaseStepDataArray& msg)
+{
+  msg.clear();
+  for (const l3::BaseStepData& s : base_step_data)
+    msg.push_back(s.toMsg());
+}
+
+void baseStepDataArrayMsgToL3(l3::BaseStepDataPtrArray base_step_data, l3_msgs::BaseStepDataArray& msg)
+{
+  msg.clear();
+  for (l3::BaseStepData::ConstPtr s : base_step_data)
+    msg.push_back(s->toMsg());
+}
+
+void baseStepDataArrayMsgToL3(l3::BaseStepDataConstPtrArray base_step_data, l3_msgs::BaseStepDataArray& msg)
+{
+  msg.clear();
+  for (l3::BaseStepData::ConstPtr s : base_step_data)
     msg.push_back(s->toMsg());
 }
 
