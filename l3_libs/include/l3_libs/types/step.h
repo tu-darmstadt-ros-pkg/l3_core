@@ -31,7 +31,7 @@
 
 #include <l3_msgs/Step.h>
 
-#include <l3_libs/types/base_step.h>
+#include <l3_libs/types/abstract_step.h>
 #include <l3_libs/types/base_step_data.h>
 #include <l3_libs/types/foot_step_data.h>
 
@@ -81,23 +81,23 @@ typedef std::vector<ExpandStatesIdx> ExpandStatesIdxArray;
  * A step is the collection of all moving and supporting feet. For all
  * moving feet the corresponding transition is stored as StepData.
  */
-class Step : public BaseStep<FootStepData::Ptr>
+class Step
 {
 public:
   // typedefs
-  typedef std::pair<const BaseIndex, BaseStepData::Ptr> BaseStepDataPair;
-  typedef std::map<BaseIndex, BaseStepData::Ptr> BaseStepDataMap;
+  typedef AbstractStep<FootStepData::Ptr, Foothold::ConstPtr> FootStep;
+  typedef AbstractStep<BaseStepData::Ptr, FloatingBase::ConstPtr> BaseStep;
 
   typedef SharedPtr<Step> Ptr;
   typedef SharedPtr<const Step> ConstPtr;
 
-  Step()
-    : BaseStep()
-  {}
+  Step() {}
 
   Step(const StepIndex& idx)
-    : BaseStep(idx)
-  {}
+  {
+    foot_step_.setStepIndex(idx);
+    base_step_.setStepIndex(idx);
+  }
 
   inline Step(const l3_msgs::Step& msg) { fromMsg(msg); }
 
@@ -112,15 +112,39 @@ public:
   l3_msgs::Step toMsg() const;
 
   /**
+   * @brief Returns assigned step index
+   * @param idx step index
+   * @return Assigned step index
+   */
+  inline void setStepIndex(const StepIndex& idx)
+  {
+    foot_step_.setStepIndex(idx);
+    base_step_.setStepIndex(idx);
+  }
+  inline const StepIndex& getStepIndex() const { return foot_step_.getStepIndex(); }
+
+  /**
    * @brief Clears all step data
    */
-  void clear() override;
+  void clear();
 
   /**
    * @brief Checks if any step data, support footholds or floating base are available.
    * @return False, if neither step data nor support footholds nor floating base are available.
    */
-  bool empty() const override { return BaseStep<FootStepData::Ptr>::empty() && support_feet_.empty() && moving_bases_map_.empty() && resting_bases_map_.empty(); }
+  bool empty() const { return foot_step_.empty() && base_step_.empty(); }
+
+  /**
+   * @brief Determines total max step duration
+   * @return Total (max) step duration
+   */
+  double getStepDuration() const { return std::max(foot_step_.getStepDuration(), base_step_.getStepDuration()); }
+
+  const FootStep& footStep() const { return foot_step_; }
+  FootStep& footStep() { return foot_step_; }
+
+  const BaseStep& baseStep() const { return base_step_; }
+  BaseStep& baseStep() { return base_step_; }
 
   inline Step& transform(const tf::Transform transform, const std_msgs::Header& header = std_msgs::Header()) { return this->transform(Transform(transform), header); }
   Step& transform(const Transform& transform, const std_msgs::Header& header = std_msgs::Header());
@@ -129,7 +153,7 @@ public:
    * @brief Returns support and step target footholds in a single list
    * @return List of all support and step target footholds
    */
-  FootholdConstPtrArray getFootholds() const;
+  FootholdConstPtrArray getAllFootholds() const;
 
   /**
    * @brief Returns foothold, which can be either a moving or supporting foot, represented in this step.
@@ -142,7 +166,7 @@ public:
    * @brief Returns support and step target floating bases in a single list
    * @return List of all support and step target floating bases
    */
-  FloatingBaseConstPtrArray getFloatingBases() const;
+  FloatingBaseConstPtrArray getAllFloatingBases() const;
 
   /**
    * @brief Returns floating base, which can be either a moving or resting base, represented in this step.
@@ -151,170 +175,11 @@ public:
    */
   FloatingBase::ConstPtr getFloatingBase(const BaseIndex& base_idx) const;
 
-  /**
-   * @brief Clears list of support footholds
-   */
-  inline void clearSupportFeet() { support_feet_.clear(); }
-
-  /**
-   * @brief Returns number of supporting footholds
-   * @return Number of supporting footholds
-   */
-  inline size_t supportFeetSize() const { return support_feet_.size(); }
-
-  /**
-   * @brief Checks if support footholds are available
-   * @return True, if support footholds are available
-   */
-  inline bool hasSupportFoot() const { return !support_feet_.empty(); }
-  inline bool hasSupportFoot(const FootIndex& foot_idx) const { return support_feet_.find(foot_idx) != support_feet_.end(); }
-
-  /**
-   * @brief Updates support footholds by given input
-   * @param foothold support foothold to be updated
-   */
-  void updateSupportFoot(Foothold::ConstPtr foothold) { support_feet_[foothold->idx] = foothold; }
-
-  /**
-   * @brief Tries to return support foothold for given foot index.
-   * @param foot_idx foot index to look up
-   * @return Supporting foothold. If no entry was found for given input foothold index,
-   * a null pointer is returned.
-   */
-  Foothold::ConstPtr getSupportFoot(const FootIndex& foot_idx) const
-  {
-    Foothold::ConstPtr foothold;
-    FootholdConstPtrMap::const_iterator itr = support_feet_.find(foot_idx);
-    if (itr != support_feet_.end())
-      foothold = itr->second;
-
-    return foothold;
-  }
-
-  /**
-   * @brief Exposes the internal support foothold map
-   * @return Internal support foothold map
-   */
-  inline const FootholdConstPtrMap& getSupportFootMap() const { return support_feet_; }
-  inline FootholdConstPtrMap& getSupportFootMap() { return support_feet_; }
-
-  /**
-   * @brief Returns list of all foot indeces represented by all support footholds
-   * @return List of foot indeces
-   */
-  inline FootIndexArray getSupportFootIndeces() const { return keysAsArray<FootIndexArray>(support_feet_); }
-
-  /**
-   * @brief Clears internally all base step data
-   */
-  inline void clearMovingFloatingBases() { moving_bases_map_.clear(); }
-
-  /**
-   * @brief Returns number of stored base step data information
-   * @return Number of stored base step data information
-   */
-  inline size_t movingFloatingBasesSize() const { return moving_bases_map_.size(); }
-
-  /**
-   * @brief Checks if moving floating base is available
-   * @return True, if moving floating base is available
-   */
-  inline bool hasMovingFloatingBase() const { return !moving_bases_map_.empty(); }
-  inline bool hasMovingFloatingBase(const BaseIndex& idx) const { return moving_bases_map_.find(idx) != moving_bases_map_.end(); }
-
-  /**
-   * @brief Updates internal moving floating base map using given input
-   * @param base_step_data moving base to be updated
-   */
-  void updateMovingFloatingBase(const BaseStepData::Ptr& base_step_data) { moving_bases_map_[base_step_data->origin->idx] = base_step_data; }
-
-  /**
-   * @brief Tries to return moving floating base for given base index.
-   * @param base_idx base index to look up
-   * @return moving floating base for given base index is available. If no moving floating base is
-   * available, the returned data is a null pointer.
-   */
-  BaseStepData::ConstPtr getMovingFloatingBase(const BaseIndex& base_idx) const
-  {
-    BaseStepData::ConstPtr base_step_data;
-    typename BaseStepDataMap::const_iterator itr = moving_bases_map_.find(base_idx);
-    if (itr != moving_bases_map_.end())
-      base_step_data = itr->second;
-
-    return base_step_data;
-  }
-
-  /**
-   * @brief Exposes the internal moving floating base map
-   * @return Internal moving floating base map
-   */
-  inline const BaseStepDataMap& getMovingFloatingBaseMap() const { return moving_bases_map_; }
-  inline BaseStepDataMap& getMovingFloatingBaseMap() { return moving_bases_map_; }
-
-  /**
-   * @brief Returns list of all moving floating bases indeces represented by all step datas
-   * @return List of moving floating base indeces
-   */
-  inline BaseIndexArray getMovingFloatingBaseIndeces() const { return keysAsArray<BaseIndexArray>(moving_bases_map_); }
-
-  /**
-   * @brief Clears list of resting floating bases
-   */
-  inline void clearRestingFloatingBases() { resting_bases_map_.clear(); }
-
-  /**
-   * @brief Returns number of resting floating bases
-   * @return Number of resting floating bases
-   */
-  inline size_t restingFloatingBasesSize() const { return resting_bases_map_.size(); }
-
-  /**
-   * @brief Checks if resting floating bases are available
-   * @return True, if resting floating bases are available
-   */
-  inline bool hasRestingFloatingBase() const { return !resting_bases_map_.empty(); }
-  inline bool hasRestingFloatingBase(const BaseIndex& base_idx) const { return resting_bases_map_.find(base_idx) != resting_bases_map_.end(); }
-
-  /**
-   * @brief Updates resting floating bases by given input
-   * @param floating_base resting floating_base to be updated
-   */
-  void updateRestingFloatingBase(FloatingBase::ConstPtr floating_base) { resting_bases_map_[floating_base->idx] = floating_base; }
-
-  /**
-   * @brief Tries to return resting floating base for given base index.
-   * @param base_idx base index to look up
-   * @return Resting floating base. If no entry was found for given input base index,
-   * a null pointer is returned.
-   */
-  FloatingBase::ConstPtr getRestingFloatingBase(const BaseIndex& base_idx) const
-  {
-    FloatingBase::ConstPtr floating_base;
-    FloatingBaseConstPtrMap::const_iterator itr = resting_bases_map_.find(base_idx);
-    if (itr != resting_bases_map_.end())
-      floating_base = itr->second;
-
-    return floating_base;
-  }
-
-  /**
-   * @brief Exposes the internal resting floating base map
-   * @return Internal resting floating base map
-   */
-  inline const FloatingBaseConstPtrMap& getRestingFloatingBaseMap() const { return resting_bases_map_; }
-  inline FloatingBaseConstPtrMap& getRestingFloatingBaseMap() { return resting_bases_map_; }
-
-  /**
-   * @brief Returns list of all resting base indeces
-   * @return List of resting floating base indeces
-   */
-  inline BaseIndexArray getRestingFloatingBaseIndeces() const { return keysAsArray<BaseIndexArray>(resting_bases_map_); }
+  VariantDataSet data;  // may contain user specific data
 
 private:
-  FootholdConstPtrMap support_feet_;  // map of stored foothold data
-
-  BaseStepDataMap moving_bases_map_;           // floating base step data
-  FloatingBaseConstPtrMap resting_bases_map_;  // floating base support position
+  FootStep foot_step_;
+  BaseStep base_step_;
 };
 
 typedef std::vector<Step> StepArray;

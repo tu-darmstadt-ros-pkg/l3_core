@@ -112,9 +112,9 @@ set(HEADERS
   include/${PROJECT_NAME}/robot_description/leg_info.h
   include/${PROJECT_NAME}/robot_description/robot_description.h
   include/${PROJECT_NAME}/robot_description/robot_description_server.h
+  include/${PROJECT_NAME}/types/abstract_step.h
   include/${PROJECT_NAME}/types/array_2d.h
   include/${PROJECT_NAME}/types/base_link.h
-  include/${PROJECT_NAME}/types/base_step.h
   include/${PROJECT_NAME}/types/base_queue.h
   include/${PROJECT_NAME}/types/boost_types.h
   include/${PROJECT_NAME}/types/eigen_types.h

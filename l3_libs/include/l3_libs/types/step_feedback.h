@@ -31,7 +31,7 @@
 
 #include <l3_msgs/StepFeedback.h>
 
-#include <l3_libs/types/base_step.h>
+#include <l3_libs/types/abstract_step.h>
 #include <l3_libs/types/step_feedback_data.h>
 
 namespace l3
@@ -41,22 +41,24 @@ namespace l3
  * A step is the collection of all moving and supporting feet. For all
  * moving feet the corresponding transition is stored as StepData.
  */
-class StepFeedback : public BaseStep<StepFeedbackData::Ptr>
+class StepFeedback
 {
 public:
   // typedefs
+  typedef AbstractStep<StepFeedbackData::Ptr, Foothold::ConstPtr> FeedbackStep;
+
   typedef SharedPtr<StepFeedback> Ptr;
   typedef SharedPtr<const StepFeedback> ConstPtr;
 
   StepFeedback()
-    : BaseStep()
+    : feedback_data_()
     , changeable_(false)
     , executing_(false)
     , finished_(false)
   {}
 
   StepFeedback(const StepIndex& idx)
-    : BaseStep(idx)
+    : feedback_data_(idx)
     , changeable_(false)
     , executing_(false)
     , finished_(false)
@@ -74,7 +76,7 @@ public:
   /**
    * @brief Clears all step data
    */
-  void clear() override;
+  void clear();
 
   bool isChangeable() const;
   bool isExecuting() const;
@@ -91,7 +93,11 @@ public:
 
   inline double stepDuration() const { return (latestExecutionEnd() - firstExecutionStart()).toSec(); }
 
+  VariantDataSet data;          // may contain user specific data
+
 private:
+  FeedbackStep feedback_data_;
+
   bool changeable_;
   bool executing_;
   bool finished_;
