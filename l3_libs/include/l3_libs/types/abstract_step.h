@@ -106,10 +106,10 @@ public:
   /**********************************/
 
   /**
-   * @brief Returns number of stored step data information
-   * @return Number of stored step data information
+   * @brief Returns number of stored moving link information
+   * @return Number of stored moving links information
    */
-  inline size_t movingLinkSize() const { return moving_links_map_.size(); }
+  inline size_t movingLinksSize() const { return moving_links_map_.size(); }
 
   /**
    * @brief Checks if moving links are available
@@ -119,20 +119,20 @@ public:
   inline bool hasMovingLink(const LinkIndex& idx) const { return moving_links_map_.find(idx) != moving_links_map_.end(); }
 
   /**
-   * @brief Updates internal step data map using given input
-   * @param step_data step data to be updated
+   * @brief Updates internal moving link map using given input
+   * @param data moving link to be updated
    */
-  void updateMovingLink(const LinkIndex& link_idx, const MovingDataType& data) { moving_links_map_[link_idx] = data; }
+  void updateMovingLink(const LinkIndex& idx, const MovingDataType& data) { moving_links_map_[idx] = data; }
 
   /**
    * @brief Tries to return moving link for given link index.
-   * @param link_idx link index to look up
-   * @param step_data [out] return variable in which found step data is referenced
-   * @return True, if step data was for given link index is available
+   * @param idx link index to look up
+   * @param data [out] return variable in which found moving link is referenced
+   * @return True, if moving link was for given link index is available
    */
-  bool getMovingLink(const LinkIndex& link_idx, MovingDataType& data) const
+  bool getMovingLink(const LinkIndex& idx, MovingDataType& data) const
   {
-    typename MovingDataMap::const_iterator itr = moving_links_map_.find(link_idx);
+    typename MovingDataMap::const_iterator itr = moving_links_map_.find(idx);
     if (itr != moving_links_map_.end())
     {
       data = itr->second;
@@ -144,8 +144,8 @@ public:
 
   /**
    * @brief Tries to return moving link for given link index.
-   * @param link_idx link index to look up
-   * @return Step data for given link index is available. If no step data is
+   * @param idx link index to look up
+   * @return moving link for given link index is available. If no moving link is
    * available, the returned data is empty.
    */
   MovingDataType getMovingLink(const LinkIndex& idx) const
@@ -156,8 +156,8 @@ public:
   }
 
   /**
-   * @brief Exposes the internal step data map
-   * @return Internal step data map
+   * @brief Exposes the internal moving link map
+   * @return Internal moving link map
    */
   inline const MovingDataMap& getMovingLinks() const { return moving_links_map_; }
   inline MovingDataMap& getMovingLinks() { return moving_links_map_; }
@@ -174,7 +174,7 @@ public:
 
   /**
    * @brief Returns number of non-moving links
-   * @return Number of supporting footholds
+   * @return Number of non-moving links
    */
   inline size_t nonMovingLinksSize() const { return non_moving_links_map_.size(); }
 
@@ -189,17 +189,17 @@ public:
    * @brief Updates non-moving links by given input
    * @param link non-moving link to be updated
    */
-  void updateNonMovingLink(const LinkIndex& link_idx, const NonMovingDataType& data) { non_moving_links_map_[link_idx] = data; }
+  void updateNonMovingLink(const LinkIndex& idx, const NonMovingDataType& data) { non_moving_links_map_[idx] = data; }
 
   /**
    * @brief Tries to return non-moving link given link index.
-   * @param link_idx link index to look up
-   * @param step_data [out] return variable in which found step data is referenced
-   * @return True, if step data was for given link index is available
+   * @param idx link index to look up
+   * @param step_data [out] return variable in which found non-moving link is referenced
+   * @return True, if non-moving link was for given link index is available
    */
-  bool getNonMovingLink(const LinkIndex& link_idx, NonMovingDataType& data) const
+  bool getNonMovingLink(const LinkIndex& idx, NonMovingDataType& data) const
   {
-    typename NonMovingDataMap::const_iterator itr = non_moving_links_map_.find(link_idx);
+    typename NonMovingDataMap::const_iterator itr = non_moving_links_map_.find(idx);
     if (itr != non_moving_links_map_.end())
     {
       data = itr->second;
@@ -210,7 +210,7 @@ public:
   }
 
   /**
-   * @brief Tries to return non-moving link for given foot index.
+   * @brief Tries to return non-moving link for given link index.
    * @param idx link index to look up
    * @return Non-moving link. If no entry was found for given input link index,
    * a null pointer is returned.
@@ -238,8 +238,7 @@ public:
 protected:
   StepIndex idx_;               // index number of step; all succeeding steps must have an unique increasing index
 
-  MovingDataMap moving_links_map_;   // map of stored step data
-
+  MovingDataMap moving_links_map_;
   NonMovingDataMap non_moving_links_map_;
 };
 
