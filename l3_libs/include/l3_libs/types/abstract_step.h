@@ -89,6 +89,12 @@ public:
   bool empty() const { return moving_links_map_.empty() && non_moving_links_map_.empty(); }
 
   /**
+   * @brief Returns the total number of all moving and non-moving links stored in this step.
+   * @return Total number of moving and non-moving links.
+   */
+  size_t size() const { return moving_links_map_.size() + non_moving_links_map_.size(); }
+
+  /**
    * @brief Determines total max step duration
    * @return Total (max) step duration
    */
