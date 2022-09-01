@@ -52,8 +52,8 @@ struct Foothold : public BaseLink<Foothold>
   typedef SharedPtr<const Foothold> ConstPtr;
 
   Foothold();
-  Foothold(FootIndex idx, const Pose& pose, const std_msgs::Header& header = std_msgs::Header(), const VariantDataSet& data = VariantDataSet());
-  Foothold(FootIndex idx, double x, double y, double z, double roll = 0.0, double pitch = 0.0, double yaw = 0.0, const std_msgs::Header& header = std_msgs::Header(),
+  Foothold(const FootIndex& idx, const Pose& pose, const std_msgs::Header& header = std_msgs::Header(), const VariantDataSet& data = VariantDataSet());
+  Foothold(const FootIndex& idx, double x, double y, double z, double roll = 0.0, double pitch = 0.0, double yaw = 0.0, const std_msgs::Header& header = std_msgs::Header(),
            const VariantDataSet& data = VariantDataSet());
   inline Foothold(double x, double y, double z, double roll = 0.0, double pitch = 0.0, double yaw = 0.0, const std_msgs::Header& header = std_msgs::Header(),
                   const VariantDataSet& data = VariantDataSet())

@@ -52,8 +52,8 @@ struct FloatingBase : public BaseLink<FloatingBase>
   typedef SharedPtr<const FloatingBase> ConstPtr;
 
   FloatingBase();
-  FloatingBase(BaseIndex idx, const Pose& pose, const std_msgs::Header& header = std_msgs::Header(), const VariantDataSet& data = VariantDataSet());
-  FloatingBase(BaseIndex idx, double x, double y, double z, double roll = 0.0, double pitch = 0.0, double yaw = 0.0, const std_msgs::Header& header = std_msgs::Header(),
+  FloatingBase(const BaseIndex& idx, const Pose& pose, const std_msgs::Header& header = std_msgs::Header(), const VariantDataSet& data = VariantDataSet());
+  FloatingBase(const BaseIndex& idx, double x, double y, double z, double roll = 0.0, double pitch = 0.0, double yaw = 0.0, const std_msgs::Header& header = std_msgs::Header(),
            const VariantDataSet& data = VariantDataSet());
   inline FloatingBase(double x, double y, double z, double roll = 0.0, double pitch = 0.0, double yaw = 0.0, const std_msgs::Header& header = std_msgs::Header(),
                   const VariantDataSet& data = VariantDataSet())

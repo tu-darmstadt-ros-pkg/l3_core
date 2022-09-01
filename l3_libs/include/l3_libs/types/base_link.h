@@ -60,7 +60,7 @@ struct BaseLink
     , yaw_(0.0)
   {}
 
-  BaseLink(LinkIndex idx, const Pose& pose, const std_msgs::Header& header = std_msgs::Header(), const VariantDataSet& data = VariantDataSet())
+  BaseLink(const LinkIndex& idx, const Pose& pose, const std_msgs::Header& header = std_msgs::Header(), const VariantDataSet& data = VariantDataSet())
     : header(header)
     , idx(idx)
     , data(data)
@@ -68,7 +68,7 @@ struct BaseLink
     setPose(pose);
   }
 
-  BaseLink(LinkIndex idx, double x, double y, double z, double roll = 0.0, double pitch = 0.0, double yaw = 0.0, const std_msgs::Header& header = std_msgs::Header(),
+  BaseLink(const LinkIndex& idx, double x, double y, double z, double roll = 0.0, double pitch = 0.0, double yaw = 0.0, const std_msgs::Header& header = std_msgs::Header(),
            const VariantDataSet& data = VariantDataSet())
     : header(header)
     , idx(idx)

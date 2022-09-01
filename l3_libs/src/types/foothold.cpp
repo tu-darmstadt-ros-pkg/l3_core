@@ -8,12 +8,12 @@ Foothold::Foothold()
   : BaseLink()
 {}
 
-Foothold::Foothold(FootIndex idx, const Pose& pose, const std_msgs::Header& header, const VariantDataSet& data)
+Foothold::Foothold(const FootIndex& idx, const Pose& pose, const std_msgs::Header& header, const VariantDataSet& data)
   : BaseLink(idx, pose, header, data)
 {
 }
 
-Foothold::Foothold(FootIndex idx, double x, double y, double z, double roll, double pitch, double yaw, const std_msgs::Header& header, const VariantDataSet& data)
+Foothold::Foothold(const FootIndex& idx, double x, double y, double z, double roll, double pitch, double yaw, const std_msgs::Header& header, const VariantDataSet& data)
   : BaseLink(idx, x, y, z, roll, pitch, yaw, header, data)
 {
 }
