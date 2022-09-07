@@ -8,12 +8,24 @@ namespace l3
 {
 RobotDescription::RobotDescription(const XmlRpc::XmlRpcValue& params)
 {
+  ros::NodeHandle pnh("~");
+
   params_ = params;
 
   if (params_.getType() != XmlRpc::XmlRpcValue::TypeStruct)
   {
     ROS_ERROR_NAMED("RobotDescription", "[RobotDescription] Parameters have wrong format.");
     return;
+  }
+
+  /// lookup robot description (URDF)
+  if (params_.hasMember("robot_description"))
+  {
+    urdf_path_ = static_cast<std::string>(params_["robot_description"]);
+
+    // gets the location of the robot description and read URDF from the parameter server
+    if (!pnh.searchParam(urdf_path_, urdf_path_) || !pnh.getParam(urdf_path_, urdf_))
+      ROS_ERROR_NAMED("RobotDescription", "[RobotDescription] Could not find parameter %s on parameter server", urdf_path_.c_str());
   }
 
   /// Parse feet section
@@ -66,6 +78,9 @@ RobotDescription::RobotDescription(ros::NodeHandle& nh, const std::string& topic
 
 void RobotDescription::fromMsg(const l3_msgs::RobotDescription& msg)
 {
+  urdf_path_ = msg.urdf_path;
+  urdf_ = msg.urdf;
+
   for (const l3_msgs::FootInfo& f : msg.foot_info)
     addFootInfo(FootInfo(f));
 
@@ -83,6 +98,9 @@ void RobotDescription::fromMsg(const l3_msgs::RobotDescription& msg)
 
 void RobotDescription::toMsg(l3_msgs::RobotDescription& msg) const
 {
+  msg.urdf_path = urdf_path_;
+  msg.urdf = urdf_;
+
   for (const FootInfoPair& p : foot_info_map_)
     msg.foot_info.push_back(p.second.toMsg());
 

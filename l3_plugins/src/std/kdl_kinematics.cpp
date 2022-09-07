@@ -8,6 +8,8 @@
 #include <l3_libs/conversions/l3_kdl_conversions.h>
 #include <l3_libs/yaml_parser.h>
 
+#include <l3_plugins/robot_model.h>
+
 #include <l3_math/angles.h>
 
 namespace l3
@@ -31,7 +33,7 @@ bool KdlKinematics::initialize(const vigir_generic_params::ParameterSet& params)
   if (!KinematicsPlugin::initialize(params))
     return false;
 
-  if (!kdl_parser::treeFromParam(param("robot_description", std::string()), tree_))
+  if (!kdl_parser::treeFromParam(RobotModel::description()->getPathToURDF(), tree_))
   {
     ROS_ERROR("[KDLKinematicsPlugin] initialize: Failed to construct KDL tree of robot description");
     return false;

@@ -65,6 +65,9 @@ public:
 
   bool isValid() const;
 
+  const std::string& getPathToURDF() const { return urdf_path_; }
+  const std::string& getURDF() const { return urdf_; }
+
   inline bool hasFootInfo(const FootIndex& foot_idx) const { return foot_info_map_.find(foot_idx) != foot_info_map_.end(); }
 
   bool getFootInfo(const FootIndex& foot_idx, FootInfo& foot_info) const;
@@ -148,6 +151,9 @@ protected:
   void generateIdxMaps();
 
   bool checkConsistency() const;
+
+  std::string urdf_path_;   // path to URDF at ros parameter server
+  std::string urdf_;        // URDF as xml string
 
   FootInfoMap foot_info_map_;  // mapping of foot index to detailed foot information
   BaseInfoMap base_info_map_;  // data about robot upper body base
