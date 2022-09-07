@@ -119,6 +119,7 @@ public:
 
   /**
    * @brief Checks if moving links are available
+   * @param idx link index to look up
    * @return True, if moving links are available
    */
   inline bool hasMovingLinks() const { return !moving_links_map_.empty(); }
@@ -126,9 +127,16 @@ public:
 
   /**
    * @brief Updates internal moving link map using given input
+   * @param idx link index to look up
    * @param data moving link to be updated
    */
   void updateMovingLink(const LinkIndex& idx, const MovingDataType& data) { moving_links_map_[idx] = data; }
+
+  /**
+   * @brief Removes moving link
+   * @param idx link index to delete
+   */
+  void removeMovingLink(const LinkIndex& idx) { moving_links_map_.erase(idx); }
 
   /**
    * @brief Tries to return moving link for given link index.
@@ -186,6 +194,7 @@ public:
 
   /**
    * @brief Checks if non-moving links are available
+   * @param idx link index to look up
    * @return True, if non-moving links are available
    */
   inline bool hasNonMovingLinks() const { return !non_moving_links_map_.empty(); }
@@ -193,9 +202,16 @@ public:
 
   /**
    * @brief Updates non-moving links by given input
-   * @param link non-moving link to be updated
+   * @param idx link index to look up
+   * @param data non-moving link to be updated
    */
   void updateNonMovingLink(const LinkIndex& idx, const NonMovingDataType& data) { non_moving_links_map_[idx] = data; }
+
+  /**
+   * @brief Removes non-moving link
+   * @param idx link index to delete
+   */
+  void removeNonMovingLink(const LinkIndex& idx) { non_moving_links_map_.erase(idx); }
 
   /**
    * @brief Tries to return non-moving link given link index.

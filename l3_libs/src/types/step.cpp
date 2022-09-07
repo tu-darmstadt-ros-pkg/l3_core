@@ -61,7 +61,7 @@ void Step::clear()
 
 Step& Step::transform(const Transform& transform, const std_msgs::Header& header)
 {
-  // transform step data
+  // transform moving footholds
   for (FootStep::MovingDataPair& p : foot_step_.getMovingLinks())
   {
     Foothold fh = p.second->origin->transform(transform);
@@ -75,7 +75,7 @@ Step& Step::transform(const Transform& transform, const std_msgs::Header& header
     p.second->target = makeShared<Foothold>(fh);
   }
 
-  // transform support footholds
+  // transform non-moving footholds
   for (FootStep::NonMovingDataPair& p : foot_step_.getNonMovingLinks())
   {
     Foothold fh = p.second->transform(transform);
@@ -98,7 +98,7 @@ Step& Step::transform(const Transform& transform, const std_msgs::Header& header
     p.second->target = makeShared<FloatingBase>(fb);
   }
 
-  // transform resting floating bases
+  // transform non-moving floating bases
   for (BaseStep::NonMovingDataPair& p : base_step_.getNonMovingLinks())
   {
     FloatingBase fb = p.second->transform(transform);
