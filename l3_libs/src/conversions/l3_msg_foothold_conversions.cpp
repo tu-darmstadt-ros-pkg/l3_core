@@ -9,6 +9,20 @@ void footholdArrayMsgToL3(const l3_msgs::FootholdArray& msg, l3::FootholdArray& 
     footholds.push_back(l3::Foothold(f));
 }
 
+void footholdArrayMsgToL3(const l3_msgs::FootholdArray& msg, l3::FootholdPtrArray& footholds)
+{
+  footholds.clear();
+  for (const l3_msgs::Foothold& f : msg)
+    footholds.push_back(l3::makeShared<Foothold>(f));
+}
+
+void footholdArrayMsgToL3(const l3_msgs::FootholdArray& msg, l3::FootholdConstPtrArray& footholds)
+{
+  footholds.clear();
+  for (const l3_msgs::Foothold& f : msg)
+    footholds.push_back(l3::makeShared<const Foothold>(f));
+}
+
 void footholdArrayL3ToMsg(const l3::FootholdArray& footholds, l3_msgs::FootholdArray& msg)
 {
   msg.clear();

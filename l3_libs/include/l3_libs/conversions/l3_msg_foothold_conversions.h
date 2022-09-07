@@ -44,6 +44,8 @@ inline void footholdL3ToMsg(const l3::Foothold& foothold, l3_msgs::Foothold& msg
 
 /// Converts a FootholdArray message into a FootholdArray
 void footholdArrayMsgToL3(const l3_msgs::FootholdArray& msg, FootholdArray& footholds);
+void footholdArrayMsgToL3(const l3_msgs::FootholdArray& msg, FootholdPtrArray& footholds);
+void footholdArrayMsgToL3(const l3_msgs::FootholdArray& msg, FootholdConstPtrArray& footholds);
 
 /// Converts a FootholdArray into a FootholdArray message
 void footholdArrayL3ToMsg(const l3::FootholdArray& footholds, l3_msgs::FootholdArray& msg);
