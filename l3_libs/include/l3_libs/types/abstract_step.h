@@ -95,6 +95,13 @@ public:
   size_t size() const { return moving_links_map_.size() + non_moving_links_map_.size(); }
 
   /**
+   * @brief Check if link is defined in this step
+   * @param idx link index to look up
+   * @return true if link is defined in this step
+   */
+  bool hasLink(const LinkIndex& idx) const { return hasMovingLink(idx) || hasNonMovingLink(idx); }
+
+  /**
    * @brief Determines total max step duration
    * @return Total (max) step duration
    */
@@ -130,7 +137,11 @@ public:
    * @param idx link index to look up
    * @param data moving link to be updated
    */
-  void updateMovingLink(const LinkIndex& idx, const MovingDataType& data) { moving_links_map_[idx] = data; }
+  void updateMovingLink(const LinkIndex& idx, const MovingDataType& data)
+  {
+    moving_links_map_[idx] = data;
+    removeNonMovingLink(idx);
+  }
 
   /**
    * @brief Removes moving link
@@ -205,7 +216,11 @@ public:
    * @param idx link index to look up
    * @param data non-moving link to be updated
    */
-  void updateNonMovingLink(const LinkIndex& idx, const NonMovingDataType& data) { non_moving_links_map_[idx] = data; }
+  void updateNonMovingLink(const LinkIndex& idx, const NonMovingDataType& data)
+  {
+    non_moving_links_map_[idx] = data;
+    removeMovingLink(idx);
+  }
 
   /**
    * @brief Removes non-moving link
@@ -258,7 +273,7 @@ public:
   inline LinkIndexArray getNonMovingLinkIndeces() const { return keysAsArray<LinkIndexArray>(non_moving_links_map_); }
 
 protected:
-  StepIndex idx_;               // index number of step; all succeeding steps must have an unique increasing index
+  StepIndex idx_;  // index number of step; all succeeding steps must have an unique increasing index
 
   MovingDataMap moving_links_map_;
   NonMovingDataMap non_moving_links_map_;
