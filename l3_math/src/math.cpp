@@ -103,6 +103,26 @@ Rotation getRotationZ(double angle)
   return rotation;
 }
 
+Position lerp(const Position& from, const Position& to, double t)
+{
+  return from + t * (to - from);
+}
+
+Pose lerp(const Pose& from, const Pose& to, double t)
+{
+  Pose p(from);
+
+  p.position() = lerp(from.getPosition(), to.getPosition(), t);
+
+  double roll = slerp(from.roll(), to.roll(), t);
+  double pitch = slerp(from.pitch(), to.pitch(), t);
+  double yaw = slerp(from.yaw(), to.yaw(), t);
+
+  p.setRPY(roll, pitch, yaw);
+
+  return p;
+}
+
 bool computeCircle(double dx, double dy, double& angle, double& radius)
 {
   if (dy == 0.0)

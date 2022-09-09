@@ -84,11 +84,32 @@ constexpr double norm(double x, double y, double z) { return sqrt(norm_sq(x, y, 
  */
 constexpr double lerp(double min, double max, double range, double value) { return min + (((max - min) / range) * value); }
 
-inline double lerpAngle(double min, double max, double range, double value)
+inline double slerp(double min, double max, double range, double value)
 {
   double delta = shortestAngularDistance(min, max);
   return lerp(min, min + delta, range, value);
 }
+
+/**
+ * @brief Calculates point on linear interpolation between [min; max] based in given (scaling) value in [0; 1]
+ * @param min Minimal out value
+ * @param max Maximal out value
+ * @param value Point on interpolating slope which must be in [0; 1]
+ * @return
+ */
+constexpr double lerp(double min, double max, double value) { return lerp(min, max, 1.0, value); }
+
+inline double slerp(double min, double max, double value) { return slerp(min, max, 1.0, value); }
+
+/**
+ * @brief Interpolates between to given poses
+ * @param from Initial pose
+ * @param to Target pose
+ * @param t Fraction [0; 1] to interpolate in between
+ * @return Interpolate pose
+ */
+Position lerp(const Position& from, const Position& to, double t);
+Pose lerp(const Pose& from, const Pose& to, double t);
 
 /**
  * @brief Computes vector's angle spanned by two points.
