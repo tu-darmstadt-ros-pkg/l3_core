@@ -227,6 +227,8 @@ set(TEST_SOURCES
   test/src/variant_data_utest.cpp
 )
 
+set_source_files_properties(test/src/step_data_utest.cpp PROPERTIES COMPILE_FLAGS "--param=max-vartrack-size=200000000")
+
 ## Add gtest based cpp test target and link libraries
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
