@@ -437,6 +437,8 @@ struct Pose : public Eigen::Affine3d
     position()(2) = z;
   }
 
+  inline void setPosition(const Position& position) { this->position() = position; }
+
   /**
    * @brief Returns corresponding angle of this pose in range of [-pi, pi].
    * Taken from https://github.com/PointCloudLibrary/pcl/blob/master/common/include/pcl/common/impl/eigen.hpp#L585
