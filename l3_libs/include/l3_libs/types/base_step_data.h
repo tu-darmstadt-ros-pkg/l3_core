@@ -48,24 +48,27 @@ struct BaseStepData
 
   BaseStepData();
 
-  BaseStepData(const FloatingBase::ConstPtr origin, const FloatingBase::ConstPtr target, const Transform delta, double step_duration);
+  BaseStepData(FloatingBase::ConstPtr origin, FloatingBase::ConstPtr target, const Transform delta, double step_duration);
 
   /**
    * @brief Generates base step based on difference of footholds such that target = origin + step.
    */
-  inline BaseStepData(const FloatingBase::ConstPtr origin, const FloatingBase::ConstPtr target)
-    : BaseStepData(origin, target, FloatingBase::getDelta(*origin, *target), 0.0)
+  inline BaseStepData(FloatingBase::ConstPtr origin, FloatingBase::ConstPtr target, double step_duration = 0.0)
+    : BaseStepData(origin, target, FloatingBase::getDelta(*origin, *target), step_duration)
   {}
 
   inline BaseStepData(const l3_msgs::BaseStepData& msg) { fromMsg(msg); }
 
   inline static BaseStepData::Ptr make() { return makeShared<BaseStepData>(); }
   inline static BaseStepData::Ptr make(const BaseStepData& other) { return makeShared<BaseStepData>(other); }
-  inline static BaseStepData::Ptr make(const FloatingBase::ConstPtr origin, const FloatingBase::ConstPtr target, const Transform delta, double step_duration)
+  inline static BaseStepData::Ptr make(FloatingBase::ConstPtr origin, FloatingBase::ConstPtr target, const Transform delta, double step_duration)
   {
     return makeShared<BaseStepData>(origin, target, delta, step_duration);
   }
-  inline static BaseStepData::Ptr make(const FloatingBase::ConstPtr origin, const FloatingBase::ConstPtr target) { return makeShared<BaseStepData>(origin, target); }
+  inline static BaseStepData::Ptr make(FloatingBase::ConstPtr origin, FloatingBase::ConstPtr target, double step_duration = 0.0)
+  {
+    return makeShared<BaseStepData>(origin, target, step_duration);
+  }
   inline static BaseStepData::Ptr make(const l3_msgs::BaseStepData& msg) { return makeShared<BaseStepData>(msg); }
 
   void fromMsg(const l3_msgs::BaseStepData& msg);

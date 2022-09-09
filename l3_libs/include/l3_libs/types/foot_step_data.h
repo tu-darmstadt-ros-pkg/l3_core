@@ -41,32 +41,34 @@ namespace l3
  * This structure describes the transition between two footholds (=step).
  */
 struct FootStepData
-{  
+{
   // typedefs
   typedef SharedPtr<FootStepData> Ptr;
   typedef SharedPtr<const FootStepData> ConstPtr;
 
   FootStepData();
 
-  FootStepData(const Foothold::ConstPtr origin, const Foothold::ConstPtr target, const Transform delta, double sway_duration, double step_duration, double swing_height);
+  FootStepData(Foothold::ConstPtr origin, Foothold::ConstPtr target, const Transform delta, double sway_duration, double step_duration, double swing_height);
 
   /**
    * @brief Generates step based on difference of footholds such that target = origin + step.
    */
-  inline FootStepData(const Foothold::ConstPtr origin, const Foothold::ConstPtr target)
-    : FootStepData(origin, target, Foothold::getDelta(*origin, *target), 0.0, 0.0, 0.0)
+  inline FootStepData(Foothold::ConstPtr origin, Foothold::ConstPtr target, double sway_duration = 0.0, double step_duration = 0.0, double swing_height = 0.0)
+    : FootStepData(origin, target, Foothold::getDelta(*origin, *target), sway_duration, step_duration, swing_height)
   {}
 
   inline FootStepData(const l3_msgs::FootStepData& msg) { fromMsg(msg); }
 
   inline static FootStepData::Ptr make() { return makeShared<FootStepData>(); }
   inline static FootStepData::Ptr make(const FootStepData& other) { return makeShared<FootStepData>(other); }
-  inline static FootStepData::Ptr make(const Foothold::ConstPtr origin, const Foothold::ConstPtr target, const Transform delta, double sway_duration, double step_duration,
-                                   double swing_height)
+  inline static FootStepData::Ptr make(Foothold::ConstPtr origin, Foothold::ConstPtr target, const Transform delta, double sway_duration, double step_duration, double swing_height)
   {
     return makeShared<FootStepData>(origin, target, delta, sway_duration, step_duration, swing_height);
   }
-  inline static FootStepData::Ptr make(const Foothold::ConstPtr origin, const Foothold::ConstPtr target) { return makeShared<FootStepData>(origin, target); }
+  inline static FootStepData::Ptr make(Foothold::ConstPtr origin, Foothold::ConstPtr target, double sway_duration = 0.0, double step_duration = 0.0, double swing_height = 0.0)
+  {
+    return makeShared<FootStepData>(origin, target, sway_duration, step_duration, swing_height);
+  }
   inline static FootStepData::Ptr make(const l3_msgs::FootStepData& msg) { return makeShared<FootStepData>(msg); }
 
   void fromMsg(const l3_msgs::FootStepData& msg);
