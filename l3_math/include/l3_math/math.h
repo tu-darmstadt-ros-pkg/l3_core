@@ -156,6 +156,30 @@ double computeCircleAngle(double dx, double dy);
 double calcHeightOnPlane(const l3::Point& point, const l3::Point& p, const l3::Vector3& n);
 
 /**
+ * @brief Checks if a given input point (x, y) is part of a specified ellipse.
+ * @param point Input point (x, y) to check
+ * @param center Center point (x, y) of the ellipsoid
+ * @param size Size of prinicipal axis (x, y) of the ellipsoid
+ * @param cos_theta Orientation theta of the ellipsoid given as cos(theta)
+ * @param sin_theta Orientation theta of the ellipsoid given as sin(theta)
+ * @return
+ */
+bool isPointInEllipse(const l3::Point& point, const l3::Point& center, const l3::Point& size, double cos_theta, double sin_theta);
+
+/**
+ * @brief Checks if a given input point (x, y) is part of a specified ellipse.
+ * @param point Input point (x, y) to check
+ * @param center Center point (x, y) of the ellipsoid
+ * @param size Size of prinicipal axis (x, y) of the ellipsoid
+ * @param theta Orientation of the ellipsoid given
+ * @return
+ */
+inline bool isPointInEllipse(const l3::Point& point, const l3::Point& center, const l3::Point& size, double theta)
+{
+  return isPointInEllipse(point, center, size, cos(theta), sin(theta));
+}
+
+/**
  * @brief Determines input point (x, y, z) is on a plane defined by a point-normal pair
  * @param point Input point (x, y, z) to check
  * @param p point on plane

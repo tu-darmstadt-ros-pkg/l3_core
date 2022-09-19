@@ -103,10 +103,7 @@ Rotation getRotationZ(double angle)
   return rotation;
 }
 
-Position lerp(const Position& from, const Position& to, double t)
-{
-  return from + t * (to - from);
-}
+Position lerp(const Position& from, const Position& to, double t) { return from + t * (to - from); }
 
 Pose lerp(const Pose& from, const Pose& to, double t)
 {
@@ -298,5 +295,19 @@ Pose calcFeetCenter(const FootholdConstPtrArray& footholds)
   double num = static_cast<double>(footholds.size());
   return Pose(ref_foot->x() + x / num, ref_foot->y() + y / num, ref_foot->z() + z / num, ref_foot->roll() + roll / num, ref_foot->pitch() + pitch / num,
               ref_foot->yaw() + yaw / num);
+}
+
+bool isPointInEllipse(const Point& point, const Point& center, const Point& size, double cos_theta, double sin_theta)
+{
+  double dx = point.x() - center.x();
+  double dy = point.y() - center.y();
+
+  double a = (cos_theta * dx + sin_theta * dy) / size.x();
+  a = a * a;
+
+  double b = (sin_theta * dx - cos_theta * dy) / size.y();
+  b = b * b;
+
+  return a + b <= 1;
 }
 }  // namespace l3
