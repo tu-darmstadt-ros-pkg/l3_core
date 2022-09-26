@@ -10,9 +10,77 @@ CyclicGaitGenerator::CyclicGaitGenerator()
   : GaitGeneratorPlugin("cyclic_gait_generator")
 {}
 
+bool CyclicGaitGenerator::loadParams(const vigir_generic_params::ParameterSet& params)
+{
+  if (!GaitGeneratorPlugin::loadParams(params))
+    return false;
+
+  getParam("ignore_floating_base", ignore_floating_base_, false, true);
+
+  loadCycle();
+
+  return true;
+}
+
 void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_description)
 {
   GaitGeneratorPlugin::setRobotDescription(robot_description);
+
+  loadCycle();
+}
+
+ExpandStatesIdxArray CyclicGaitGenerator::predMovingPatterns(Step::ConstPtr /*step*/, const ExpandStatesIdxArray& next_seq) const
+{
+  // allow for starting with any leg
+  if (next_seq.empty())
+    return start_;
+
+  ExpandStatesIdx next = next_seq.front();
+  if (next.foot_idx.empty() && next.floating_base_idx.empty())
+    return start_;
+
+  if (ignore_floating_base_)
+    next.floating_base_idx.clear();
+
+  // search next moving pattern
+  std::map<ExpandStatesIdx, ExpandStatesIdx>::const_iterator itr = pred_.find(next);
+  if (itr != succ_.end())
+    return ExpandStatesIdxArray{ itr->second };
+  else
+  {
+    ROS_WARN("[%s] No predecessor pattern '%s' defined! Fix it immediatly!", getName().c_str(), toString(next).c_str());
+    return ExpandStatesIdxArray();
+  }
+}
+
+ExpandStatesIdxArray CyclicGaitGenerator::succMovingPatterns(Step::ConstPtr /*step*/, const ExpandStatesIdxArray& last_seq) const
+{
+  // allow for starting with any leg
+  if (last_seq.empty())
+    return start_;
+
+  ExpandStatesIdx last = last_seq.back();
+  if (last.foot_idx.empty() && last.floating_base_idx.empty())
+    return start_;
+
+  if (ignore_floating_base_)
+    last.floating_base_idx.clear();
+
+  // search next moving pattern
+  std::map<ExpandStatesIdx, ExpandStatesIdx>::const_iterator itr = succ_.find(last);
+  if (itr != succ_.end())
+    return ExpandStatesIdxArray{ itr->second };
+  else
+  {
+    ROS_WARN("[%s] No successor for pattern '%s' defined! Fix it immediatly!", getName().c_str(), toString(last).c_str());
+    return ExpandStatesIdxArray();
+  }
+}
+
+bool CyclicGaitGenerator::loadCycle()
+{
+  if (!robot_description_)
+    return false;
 
   cycle_.clear();
   succ_.clear();
@@ -22,12 +90,12 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
   if (hasParam("cycle"))
   {
     if (!getCycleFromYaml("cycle", cycle_))
-      return;
+      return false;
   }
   else
   {
     ROS_INFO_NAMED("CyclicGaitGenerator", "[CyclicGaitGenerator] No cycle was given, generating simple foot cycling.");
-    for (const FootInfoPair& p : RobotModel::description()->getFootInfoMap())
+    for (const FootInfoPair& p : robot_description_->getFootInfoMap())
     {
       if (!p.second.indirect)
         cycle_.push_back(ExpandStatesIdx{ FootIndexArray{ p.first }, BaseIndexArray{} });
@@ -36,7 +104,7 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
     if (cycle_.empty())
     {
       ROS_ERROR_NAMED("CyclicGaitGenerator", "[CyclicGaitGenerator] RobotDescription does not contain any feet!");
-      return;
+      return false;
     }
   }
 
@@ -64,7 +132,7 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
   if (hasParam("start"))
   {
     if (!getCycleFromYaml("start", start_))
-      return;
+      return false;
 
     // sanity check of input
     for (const ExpandStatesIdx& arr : start_)
@@ -72,7 +140,7 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
       if (pred_.find(arr) == pred_.end())
       {
         ROS_ERROR_NAMED("CyclicGaitGenerator", "[CyclicGaitGenerator] At least one input start option does not match with any element of the given cycle! Fix it immediatly!");
-        return;
+        return false;
       }
     }
   }
@@ -82,48 +150,8 @@ void CyclicGaitGenerator::setRobotDescription(RobotDescription::ConstPtr robot_d
     for (const ExpandStatesIdx& arr : cycle_)
       start_.push_back(arr);
   }
-}
 
-ExpandStatesIdxArray CyclicGaitGenerator::predMovingPatterns(Step::ConstPtr /*step*/, const ExpandStatesIdxArray& next_seq) const
-{
-  // allow for starting with any leg
-  if (next_seq.empty())
-    return start_;
-
-  ExpandStatesIdx next = next_seq.front();
-  if (next.foot_idx.empty() && next.floating_base_idx.empty())
-    return start_;
-
-  // search next moving pattern
-  std::map<ExpandStatesIdx, ExpandStatesIdx>::const_iterator itr = pred_.find(next);
-  if (itr != succ_.end())
-    return ExpandStatesIdxArray{ itr->second };
-  else
-  {
-    ROS_WARN("[%s] No predecessor pattern '%s' defined! Fix it immediatly!", getName().c_str(), toString(next).c_str());
-    return ExpandStatesIdxArray();
-  }
-}
-
-ExpandStatesIdxArray CyclicGaitGenerator::succMovingPatterns(Step::ConstPtr /*step*/, const ExpandStatesIdxArray& last_seq) const
-{
-  // allow for starting with any leg
-  if (last_seq.empty())
-    return start_;
-
-  ExpandStatesIdx last = last_seq.back();
-  if (last.foot_idx.empty() && last.floating_base_idx.empty())
-    return start_;
-
-  // search next moving pattern
-  std::map<ExpandStatesIdx, ExpandStatesIdx>::const_iterator itr = succ_.find(last);
-  if (itr != succ_.end())
-    return ExpandStatesIdxArray{ itr->second };
-  else
-  {
-    ROS_WARN("[%s] No successor for pattern '%s' defined! Fix it immediatly!", getName().c_str(), toString(last).c_str());
-    return ExpandStatesIdxArray();
-  }
+  return true;
 }
 
 bool CyclicGaitGenerator::getCycleFromYaml(const std::string& key, ExpandStatesIdxArray& cycle)

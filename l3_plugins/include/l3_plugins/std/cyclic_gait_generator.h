@@ -65,6 +65,8 @@ public:
 
   CyclicGaitGenerator();
 
+  bool loadParams(const vigir_generic_params::ParameterSet& params) override;
+
   void setRobotDescription(RobotDescription::ConstPtr robot_description) override;
 
   /**
@@ -88,7 +90,9 @@ public:
   ExpandStatesIdxArray succMovingPatterns(Step::ConstPtr step, const ExpandStatesIdxArray& last_seq) const override;
 
 protected:
+  bool loadCycle();
   bool getCycleFromYaml(const std::string& key, ExpandStatesIdxArray& cycle);
+
   static std::string toString(const ExpandStatesIdxArray& cycle);
   static std::string toString(const ExpandStatesIdx& step);
 
@@ -96,6 +100,8 @@ protected:
   LookupTable succ_;
   LookupTable pred_;
   ExpandStatesIdxArray start_;
+
+  bool ignore_floating_base_;
 };
 }  // namespace l3
 

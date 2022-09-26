@@ -23,7 +23,7 @@ bool KdlKinematics::loadParams(const vigir_generic_params::ParameterSet& params)
   if (!KinematicsPlugin::loadParams(params))
     return false;
 
-  getParam("ignore_foot_orientation", ignore_foot_orientation_, false, true);
+  ignore_foot_orientation_ = param("ignore_foot_orientation", false, true);
 
   return true;
 }
