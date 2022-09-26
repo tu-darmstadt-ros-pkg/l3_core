@@ -88,14 +88,16 @@ public:
 
   /**
    * @brief Determines the static transform from the geometric feet center to the root link based on neutral stance.
+   * @param feet_center feet center from which the base leveling (roll, pitch) is determined
    * @return static transfrom from geometric feet center to root link
    */
   virtual Transform calcStaticFeetCenterToRoot() const;
+  virtual Transform calcStaticFeetCenterToRoot(const Pose& feet_center) const;
 
   /**
    * @brief Determines the transform from the feet center of the given robot configuration
    * to the root link.
-   * @param feet_center feet center
+   * @param feet_center feet center from which the base leveling (roll, pitch) is determined
    * @param footholds foothold configuration
    * @return transform from given feet center to root link
    */
@@ -112,9 +114,11 @@ public:
 
   /**
    * @brief Determines the static transform from the geometric feet center to the robot base based on neutral stance.
+   * @param feet_center feet center from which the base leveling (roll, pitch) is determined
    * @return static transfrom from geometric feet center to base link
    */
   virtual Transform calcStaticFeetCenterToBase() const;
+  virtual Transform calcStaticFeetCenterToBase(const Pose& feet_center) const;
 
   /**
    * @brief Determines the transform from the geometric feet center of the given robot configuration
@@ -134,7 +138,7 @@ public:
    * @param feet_center feet center from which the base pose should be determined
    * @return base pose calculated with the static transforms
    */
-  inline Pose getStaticBasePose(const Pose& feet_center) const { return feet_center * calcStaticFeetCenterToBase(); }
+  inline Pose calcStaticBasePose(const Pose& feet_center) const { return feet_center * calcStaticFeetCenterToBase(feet_center); }
 
   /**
    * @brief Returns the base pose based on given feet center and the dynamically determined transforms.
@@ -142,14 +146,8 @@ public:
    * @param footholds current foothold configuration
    * @return base pose calculated with the dynamically determined transforms
    */
-  inline Pose getBasePose(const Pose& feet_center, const FootholdArray& footholds) const
-  {
-    return feet_center * calcFeetCenterToBase(feet_center, footholds);
-  }
-  inline Pose getBasePose(const Pose& feet_center, const FootholdConstPtrArray& footholds) const
-  {
-    return feet_center * calcFeetCenterToBase(feet_center, footholds);
-  }
+  inline Pose calcBasePose(const Pose& feet_center, const FootholdArray& footholds) const { return feet_center * calcFeetCenterToBase(feet_center, footholds); }
+  inline Pose calcBasePose(const Pose& feet_center, const FootholdConstPtrArray& footholds) const { return feet_center * calcFeetCenterToBase(feet_center, footholds); }
 
   virtual bool calcStaticTransformForChain(const std::string& root_link, const std::string& tip_link, Transform& transform) const { return false; }
 
@@ -184,18 +182,12 @@ public:
    * @return True if a valid inverse kinematics solution was found
    */
   virtual bool calcLegIK(const Pose& base_pose, const Foothold& foothold, const std::vector<double>& cur_q, std::vector<double>& q) const;
-  inline bool calcLegIK(const Pose& base_pose, const Foothold& foothold, std::vector<double>& q) const
-  {
-    return calcLegIK(base_pose, foothold, std::vector<double>(), q);
-  }
+  inline bool calcLegIK(const Pose& base_pose, const Foothold& foothold, std::vector<double>& q) const { return calcLegIK(base_pose, foothold, std::vector<double>(), q); }
   inline bool calcLegIK(const Foothold& foothold, const std::vector<double>& cur_q, std::vector<double>& q) const
   {
     return calcLegIK(calcStaticFeetCenterToBase(), foothold, cur_q, q);
   }
-  inline bool calcLegIK(const Foothold& foothold, std::vector<double>& q) const
-  {
-    return calcLegIK(calcStaticFeetCenterToBase(), foothold, std::vector<double>(), q);
-  }
+  inline bool calcLegIK(const Foothold& foothold, std::vector<double>& q) const { return calcLegIK(calcStaticFeetCenterToBase(), foothold, std::vector<double>(), q); }
 
   /**
    * @brief Computes the inverse kinematics solution for the neutral stance.
@@ -204,10 +196,7 @@ public:
    * @return True if a valid inverse kinematics solution was found
    */
   bool calcNeutralStanceIK(const Pose& base_pose, std::map<LegIndex, std::vector<double>>& leg_joint_states) const;
-  inline bool calcNeutralStanceIK(std::map<LegIndex, std::vector<double>>& leg_joint_states) const
-  {
-    return calcNeutralStanceIK(calcStaticFeetCenterToBase(), leg_joint_states);
-  }
+  inline bool calcNeutralStanceIK(std::map<LegIndex, std::vector<double>>& leg_joint_states) const { return calcNeutralStanceIK(calcStaticFeetCenterToBase(), leg_joint_states); }
 
 protected:
   RobotDescription::ConstPtr robot_description_;

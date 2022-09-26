@@ -20,6 +20,8 @@ void KinematicsPlugin::setRobotDescription(RobotDescription::ConstPtr robot_desc
 
 Transform KinematicsPlugin::calcStaticFeetCenterToRoot() const { return calcStaticFeetCenterToBase() * calcBaseToRoot(); }
 
+Transform KinematicsPlugin::calcStaticFeetCenterToRoot(const Pose& feet_center) const { return calcStaticFeetCenterToBase(feet_center) * calcBaseToRoot(); }
+
 Transform KinematicsPlugin::calcFeetCenterToRoot(const Pose& feet_center, const FootholdArray& footholds) const
 {
   return calcFeetCenterToBase(feet_center, footholds) * calcBaseToRoot();
@@ -36,17 +38,22 @@ Transform KinematicsPlugin::calcStaticFeetCenterToBase() const
   return base_info.link_to_feet_center_offset.inverse();
 }
 
-Transform KinematicsPlugin::calcFeetCenterToBase(const Pose& feet_center, const FootholdArray& /*footholds*/) const
+Transform KinematicsPlugin::calcStaticFeetCenterToBase(const Pose& feet_center) const
 {
   if (leveled_base_)
-    return calcStaticFeetCenterToBase();
+    return Transform(0.0, 0.0, 0.0, feet_center.roll(), feet_center.pitch(), 0.0).inverse() * calcStaticFeetCenterToBase();
   else
-    return Transform(0.0, 0.0, 0.0, feet_center.roll(), feet_center.pitch(), 0.0) * calcStaticFeetCenterToBase();
+    return calcStaticFeetCenterToBase();
+}
+
+Transform KinematicsPlugin::calcFeetCenterToBase(const Pose& feet_center, const FootholdArray& /*footholds*/) const
+{
+  return calcStaticFeetCenterToBase(feet_center);
 }
 
 Transform KinematicsPlugin::calcFeetCenterToBase(const Pose& feet_center, const FootholdConstPtrArray& /*footholds*/) const
 {
-  return calcFeetCenterToBase(feet_center, FootholdArray());
+  return calcStaticFeetCenterToBase(feet_center);
 }
 
 Transform KinematicsPlugin::calcBaseToRoot() const
@@ -90,7 +97,7 @@ bool KinematicsPlugin::calcLegIK(const Pose& base_pose, const Foothold& foothold
   Transform base_to_leg_root;
   if (!calcStaticTransformForChain(base_link, leg_info.root_link, base_to_leg_root))
   {
-    ROS_WARN_ONCE("[%s] initialize: Could not determine transform from base ('%s') to leg root ('%s'). Using identity transform.", getName().c_str(), base_link.c_str(),
+    ROS_WARN_ONCE("[%s] calcLegIK: Could not determine transform from base ('%s') to leg root ('%s'). Using identity transform.", getName().c_str(), base_link.c_str(),
                   leg_info.root_link.c_str());
     base_to_leg_root = Transform();
   }
@@ -100,7 +107,7 @@ bool KinematicsPlugin::calcLegIK(const Pose& base_pose, const Foothold& foothold
   Transform leg_tip_to_foot;
   if (!calcStaticTransformForChain(leg_info.tip_link, foot_info.link, leg_tip_to_foot))
   {
-    ROS_WARN_ONCE("[%s] initialize: Could not determine transform from leg tip ('%s') to foot ('%s'). Using identity transform.", getName().c_str(), leg_info.tip_link.c_str(),
+    ROS_WARN_ONCE("[%s] calcLegIK: Could not determine transform from leg tip ('%s') to foot ('%s'). Using identity transform.", getName().c_str(), leg_info.tip_link.c_str(),
                   foot_info.link.c_str());
     leg_tip_to_foot = Transform();
   }
