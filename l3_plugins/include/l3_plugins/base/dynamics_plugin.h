@@ -34,6 +34,7 @@
 #include <vigir_pluginlib/plugin.h>
 
 #include <l3_libs/types/memory.h>
+#include <l3_libs/robot_description/robot_description.h>
 
 namespace l3
 {
@@ -46,8 +47,12 @@ public:
 
   DynamicsPlugin(const std::string& name);
 
+  bool isUnique() const final { return true; }
+
+  virtual void setRobotDescription(RobotDescription::ConstPtr robot_description);
+
 protected:
-private:
+  RobotDescription::ConstPtr robot_description_;
 };
 }  // namespace l3
 

@@ -105,7 +105,10 @@ bool RobotModel::loadKinematicsPlugin()
 
   // get kinematics plugins
   if (vigir_pluginlib::PluginManager::hasPluginsByBaseClass("l3::KinematicsPlugin"))
+  {
     vigir_pluginlib::PluginManager::getPlugin(mutableInstance().kinematics_);
+    instance().kinematics_->setRobotDescription(instance().robot_description_);
+  }
 
   return true;
 }
@@ -116,7 +119,10 @@ bool RobotModel::loadDynamicsPlugin()
 
   // get dynamics plugins
   if (vigir_pluginlib::PluginManager::hasPluginsByBaseClass("l3::DynamicsPlugin"))
+  {
     vigir_pluginlib::PluginManager::getPlugin(mutableInstance().dynamics_);
+    instance().dynamics_->setRobotDescription(instance().robot_description_);
+  }
 
   return true;
 }

@@ -16,43 +16,42 @@ bool KinematicsPlugin::loadParams(const vigir_generic_params::ParameterSet& para
   return true;
 }
 
-Transform KinematicsPlugin::calcStaticFeetCenterToRoot(const RobotDescription& description) const
+void KinematicsPlugin::setRobotDescription(RobotDescription::ConstPtr robot_description) { robot_description_ = robot_description; }
+
+Transform KinematicsPlugin::calcStaticFeetCenterToRoot() const { return calcStaticFeetCenterToBase() * calcBaseToRoot(); }
+
+Transform KinematicsPlugin::calcFeetCenterToRoot(const Pose& feet_center, const FootholdArray& footholds) const
 {
-  return calcStaticFeetCenterToBase(description) * calcBaseToRoot(description);
+  return calcFeetCenterToBase(feet_center, footholds) * calcBaseToRoot();
 }
 
-Transform KinematicsPlugin::calcFeetCenterToRoot(const RobotDescription& description, const Pose& feet_center, const FootholdArray& footholds) const
+Transform KinematicsPlugin::calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& footholds) const
 {
-  return calcFeetCenterToBase(description, feet_center, footholds) * calcBaseToRoot(description);
+  return calcFeetCenterToBase(feet_center, footholds) * calcBaseToRoot();
 }
 
-Transform KinematicsPlugin::calcFeetCenterToRoot(const RobotDescription& description, const Pose& feet_center, const FootholdConstPtrArray& footholds) const
+Transform KinematicsPlugin::calcStaticFeetCenterToBase() const
 {
-  return calcFeetCenterToBase(description, feet_center, footholds) * calcBaseToRoot(description);
-}
-
-Transform KinematicsPlugin::calcStaticFeetCenterToBase(const RobotDescription& description) const
-{
-  BaseInfo base_info = description.getBaseInfo(BaseInfo::MAIN_BODY_IDX);
+  BaseInfo base_info = robot_description_->getBaseInfo(BaseInfo::MAIN_BODY_IDX);
   return base_info.link_to_feet_center_offset.inverse();
 }
 
-Transform KinematicsPlugin::calcFeetCenterToBase(const RobotDescription& description, const Pose& feet_center, const FootholdArray& /*footholds*/) const
+Transform KinematicsPlugin::calcFeetCenterToBase(const Pose& feet_center, const FootholdArray& /*footholds*/) const
 {
   if (leveled_base_)
-    return calcStaticFeetCenterToBase(description);
+    return calcStaticFeetCenterToBase();
   else
-    return Transform(0.0, 0.0, 0.0, feet_center.roll(), feet_center.pitch(), 0.0) * calcStaticFeetCenterToBase(description);
+    return Transform(0.0, 0.0, 0.0, feet_center.roll(), feet_center.pitch(), 0.0) * calcStaticFeetCenterToBase();
 }
 
-Transform KinematicsPlugin::calcFeetCenterToBase(const RobotDescription& description, const Pose& feet_center, const FootholdConstPtrArray& /*footholds*/) const
+Transform KinematicsPlugin::calcFeetCenterToBase(const Pose& feet_center, const FootholdConstPtrArray& /*footholds*/) const
 {
-  return calcFeetCenterToBase(description, feet_center, FootholdArray());
+  return calcFeetCenterToBase(feet_center, FootholdArray());
 }
 
-Transform KinematicsPlugin::calcBaseToRoot(const RobotDescription& description) const
+Transform KinematicsPlugin::calcBaseToRoot() const
 {
-  BaseInfo base_info = description.getBaseInfo(BaseInfo::MAIN_BODY_IDX);
+  BaseInfo base_info = robot_description_->getBaseInfo(BaseInfo::MAIN_BODY_IDX);
   const std::string& base_link = base_info.link;
 
   Transform base_to_root;
@@ -64,21 +63,21 @@ Transform KinematicsPlugin::calcBaseToRoot(const RobotDescription& description) 
   return base_to_root;
 }
 
-bool KinematicsPlugin::calcLegIK(const Pose& base_pose, const Foothold& foothold, const RobotDescription& description, const std::vector<double>& cur_q,
+bool KinematicsPlugin::calcLegIK(const Pose& base_pose, const Foothold& foothold, const std::vector<double>& cur_q,
                                  std::vector<double>& q) const
 {
   q.clear();
 
   // extract robot information
-  BaseInfo base_info = description.getBaseInfo(BaseInfo::MAIN_BODY_IDX);
+  BaseInfo base_info = robot_description_->getBaseInfo(BaseInfo::MAIN_BODY_IDX);
   const std::string& base_link = base_info.link;
 
   FootInfo foot_info;
-  if (!description.getFootInfo(foothold.idx, foot_info))
+  if (!robot_description_->getFootInfo(foothold.idx, foot_info))
     return false;
 
   LegInfo leg_info;
-  if (!description.getLegInfo(foothold.idx, leg_info))
+  if (!robot_description_->getLegInfo(foothold.idx, leg_info))
     return false;
 
   // here, input foothold are represented in planner frame (center of sole), just offset them into robot's foot frame
@@ -137,27 +136,27 @@ bool KinematicsPlugin::calcLegIK(const Pose& base_pose, const Foothold& foothold
   return true;
 }
 
-bool KinematicsPlugin::calcNeutralStanceIK(const Pose& base_pose, const RobotDescription& description, std::map<LegIndex, std::vector<double>>& leg_joint_states) const
+bool KinematicsPlugin::calcNeutralStanceIK(const Pose& base_pose, std::map<LegIndex, std::vector<double>>& leg_joint_states) const
 {
   leg_joint_states.clear();
 
-  for (const FootInfoPair& p : description.getFootInfoMap())
+  for (const FootInfoPair& p : robot_description_->getFootInfoMap())
   {
     const FootInfo& foot_info = p.second;
 
     // ignore foot without leg info
-    if (!description.hasLegInfo(foot_info.idx))
+    if (!robot_description_->hasLegInfo(foot_info.idx))
       continue;
 
     std::vector<double> q;
-    if (calcLegIK(base_pose, Foothold(foot_info.idx, foot_info.neutral_stance), description, q))
+    if (calcLegIK(base_pose, Foothold(foot_info.idx, foot_info.neutral_stance), q))
     {
       leg_joint_states[foot_info.idx] = q;
     }
     else
     {
       ROS_ERROR("[%s] calcNeutralStanceIK: Failed to calculate neutral stance IK for leg %u (%s)!", getName().c_str(), foot_info.idx,
-                description.getLegInfo(foot_info.idx).name.c_str());
+                robot_description_->getLegInfo(foot_info.idx).name.c_str());
       return false;
     }
   }

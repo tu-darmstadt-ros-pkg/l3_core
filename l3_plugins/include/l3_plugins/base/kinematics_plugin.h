@@ -57,6 +57,10 @@ public:
 
   bool loadParams(const vigir_generic_params::ParameterSet& params) override;
 
+  bool isUnique() const final { return true; }
+
+  virtual void setRobotDescription(RobotDescription::ConstPtr robot_description);
+
   const std::string& getRootLink() const { return root_link_; }
 
   virtual bool getMassOfChain(const std::string& start_link_id, double& mass) const { return false; }
@@ -84,21 +88,19 @@ public:
 
   /**
    * @brief Determines the static transform from the geometric feet center to the root link based on neutral stance.
-   * @param description RobotDescription
    * @return static transfrom from geometric feet center to root link
    */
-  virtual Transform calcStaticFeetCenterToRoot(const RobotDescription& description) const;
+  virtual Transform calcStaticFeetCenterToRoot() const;
 
   /**
    * @brief Determines the transform from the feet center of the given robot configuration
    * to the root link.
-   * @param description RobotDescription
    * @param feet_center feet center
    * @param footholds foothold configuration
    * @return transform from given feet center to root link
    */
-  virtual Transform calcFeetCenterToRoot(const RobotDescription& description, const Pose& feet_center, const FootholdArray& footholds) const;
-  virtual Transform calcFeetCenterToRoot(const RobotDescription& description, const Pose& feet_center, const FootholdConstPtrArray& footholds) const;
+  virtual Transform calcFeetCenterToRoot(const Pose& feet_center, const FootholdArray& footholds) const;
+  virtual Transform calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& footholds) const;
   /// If upper variant is overloaded, one should use following code snippet for sake of simplicity (calling overloaded calcFeetCenterToRoot)
   // Transform calcFeetCenterToRoot(const Pose& feet_center, const FootholdConstPtrArray& footholds) const override
   //{
@@ -110,24 +112,44 @@ public:
 
   /**
    * @brief Determines the static transform from the geometric feet center to the robot base based on neutral stance.
-   * @param description RobotDescription
    * @return static transfrom from geometric feet center to base link
    */
-  virtual Transform calcStaticFeetCenterToBase(const RobotDescription& description) const;
+  virtual Transform calcStaticFeetCenterToBase() const;
 
   /**
    * @brief Determines the transform from the geometric feet center of the given robot configuration
    * to the robot base. Useful for use with calcLegIK(...). The given feet center is only used to determine
    * base leveling (roll, pitch).
-   * @param description RobotDescription
    * @param feet_center feet center from which the base leveling (roll, pitch) is determined
-   * @param footholds foothold configuration
+   * @param footholds current foothold configuration
    * @return transfrom from geometric feet center to base link
    */
-  virtual Transform calcFeetCenterToBase(const RobotDescription& description, const Pose& feet_center, const FootholdArray& footholds) const;
-  virtual Transform calcFeetCenterToBase(const RobotDescription& description, const Pose& feet_center, const FootholdConstPtrArray& footholds) const;
+  virtual Transform calcFeetCenterToBase(const Pose& feet_center, const FootholdArray& footholds) const;
+  virtual Transform calcFeetCenterToBase(const Pose& feet_center, const FootholdConstPtrArray& footholds) const;
 
-  virtual Transform calcBaseToRoot(const RobotDescription& description) const;
+  virtual Transform calcBaseToRoot() const;
+
+  /**
+   * @brief Returns the base pose based on given feet center and the static transforms.
+   * @param feet_center feet center from which the base pose should be determined
+   * @return base pose calculated with the static transforms
+   */
+  inline Pose getStaticBasePose(const Pose& feet_center) const { return feet_center * calcStaticFeetCenterToBase(); }
+
+  /**
+   * @brief Returns the base pose based on given feet center and the dynamically determined transforms.
+   * @param feet_center feet center from which the base pose should be determined
+   * @param footholds current foothold configuration
+   * @return base pose calculated with the dynamically determined transforms
+   */
+  inline Pose getBasePose(const Pose& feet_center, const FootholdArray& footholds) const
+  {
+    return feet_center * calcFeetCenterToBase(feet_center, footholds);
+  }
+  inline Pose getBasePose(const Pose& feet_center, const FootholdConstPtrArray& footholds) const
+  {
+    return feet_center * calcFeetCenterToBase(feet_center, footholds);
+  }
 
   virtual bool calcStaticTransformForChain(const std::string& root_link, const std::string& tip_link, Transform& transform) const { return false; }
 
@@ -157,39 +179,39 @@ public:
    * @param base_pose Pose of the robot's base link
    * @param feet_center Pose of the geometrical feet center
    * @param foothold Target foothold location (given in planning/sole frame)
-   * @param description RobotDescription
    * @param cur_q (optional) Current joint states which can improve finding a valid solution
    * @param q [out] Calculated inverse kinematics solution if found
    * @return True if a valid inverse kinematics solution was found
    */
-  virtual bool calcLegIK(const Pose& base_pose, const Foothold& foothold, const RobotDescription& description, const std::vector<double>& cur_q, std::vector<double>& q) const;
-  inline bool calcLegIK(const Pose& base_pose, const Foothold& foothold, const RobotDescription& description, std::vector<double>& q) const
+  virtual bool calcLegIK(const Pose& base_pose, const Foothold& foothold, const std::vector<double>& cur_q, std::vector<double>& q) const;
+  inline bool calcLegIK(const Pose& base_pose, const Foothold& foothold, std::vector<double>& q) const
   {
-    return calcLegIK(base_pose, foothold, description, std::vector<double>(), q);
+    return calcLegIK(base_pose, foothold, std::vector<double>(), q);
   }
-  inline bool calcLegIK(const Foothold& foothold, const RobotDescription& description, const std::vector<double>& cur_q, std::vector<double>& q) const
+  inline bool calcLegIK(const Foothold& foothold, const std::vector<double>& cur_q, std::vector<double>& q) const
   {
-    return calcLegIK(calcStaticFeetCenterToBase(description), foothold, description, cur_q, q);
+    return calcLegIK(calcStaticFeetCenterToBase(), foothold, cur_q, q);
   }
-  inline bool calcLegIK(const Foothold& foothold, const RobotDescription& description, std::vector<double>& q) const
+  inline bool calcLegIK(const Foothold& foothold, std::vector<double>& q) const
   {
-    return calcLegIK(calcStaticFeetCenterToBase(description), foothold, description, std::vector<double>(), q);
+    return calcLegIK(calcStaticFeetCenterToBase(), foothold, std::vector<double>(), q);
   }
 
   /**
    * @brief Computes the inverse kinematics solution for the neutral stance.
    * @param base_pose Pose of the robot's base link
-   * @param description RobotDescription
    * @param leg_joint_states [out] Resulting joint states
    * @return True if a valid inverse kinematics solution was found
    */
-  bool calcNeutralStanceIK(const Pose& base_pose, const RobotDescription& description, std::map<LegIndex, std::vector<double>>& leg_joint_states) const;
-  inline bool calcNeutralStanceIK(const RobotDescription& description, std::map<LegIndex, std::vector<double>>& leg_joint_states) const
+  bool calcNeutralStanceIK(const Pose& base_pose, std::map<LegIndex, std::vector<double>>& leg_joint_states) const;
+  inline bool calcNeutralStanceIK(std::map<LegIndex, std::vector<double>>& leg_joint_states) const
   {
-    return calcNeutralStanceIK(calcStaticFeetCenterToBase(description), description, leg_joint_states);
+    return calcNeutralStanceIK(calcStaticFeetCenterToBase(), leg_joint_states);
   }
 
 protected:
+  RobotDescription::ConstPtr robot_description_;
+
   std::string root_link_;  // root link of chain
 
   bool leveled_base_;  // indicates if base is leveled (base center is over feet center)

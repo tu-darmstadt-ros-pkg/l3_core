@@ -82,6 +82,7 @@ public:
 
   static void printPluginSummary();
 
+  /** Note: Using this pointers is not thread-safe. When new model is published (should not happen!) while these pointers are used, unexpected results may occur. */
   static RobotDescription::ConstPtr description() { return instance().robot_description_; }
 
   static KinematicsPlugin::Ptr kinematics() { return instance().kinematics_; }

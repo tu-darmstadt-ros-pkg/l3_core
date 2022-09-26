@@ -73,8 +73,6 @@ public:
 
 protected:
   RobotDescription::ConstPtr robot_description_;
-
-private:
 };
 }  // namespace l3
 
