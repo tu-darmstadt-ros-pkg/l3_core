@@ -113,6 +113,8 @@ protected:
   // mutex to ensure thread safeness
   mutable Mutex mutex_;
 
+  bool is_initialized_;
+
   // robot configuration
   RobotDescription::ConstPtr robot_description_;
 

@@ -4,10 +4,15 @@
 
 namespace l3
 {
-RobotModel::RobotModel() {}
+RobotModel::RobotModel()
+  : is_initialized_(false)
+{}
 
 bool RobotModel::initialize(const XmlRpc::XmlRpcValue& params)
 {
+  if (instance().is_initialized_)
+    return true;
+
   // register plugins
   vigir_pluginlib::PluginManager::addPluginClassLoader<KinematicsPlugin>("l3_plugins", "l3::KinematicsPlugin");
   vigir_pluginlib::PluginManager::addPluginClassLoader<DynamicsPlugin>("l3_plugins", "l3::DynamicsPlugin");
@@ -28,11 +33,16 @@ bool RobotModel::initialize(const XmlRpc::XmlRpcValue& params)
     return false;
   }
 
+  mutableInstance().is_initialized_ = true;
+
   return true;
 }
 
 bool RobotModel::initialize(ros::NodeHandle& nh, const std::string& topic)
 {
+  if (instance().is_initialized_)
+    return true;
+
   // register plugins
   vigir_pluginlib::PluginManager::addPluginClassLoader<KinematicsPlugin>("l3_plugins", "l3::KinematicsPlugin");
   vigir_pluginlib::PluginManager::addPluginClassLoader<DynamicsPlugin>("l3_plugins", "l3::DynamicsPlugin");
@@ -48,7 +58,9 @@ bool RobotModel::initialize(ros::NodeHandle& nh, const std::string& topic)
       ROS_WARN("[RobotModel] No robot model received at topic '%s' yet!", ros::names::append(nh.getNamespace(), topic).c_str());
   }
 
-  mutableInstance().fromMsg(*model_msg);
+  mutableInstance().fromMsg(*model_msg);  
+  mutableInstance().is_initialized_ = true;
+
   return true;
 }
 
