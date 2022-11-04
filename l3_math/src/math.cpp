@@ -146,6 +146,20 @@ double computeCircleAngle(double dx, double dy)
 
 double calcHeightOnPlane(const l3::Point& point, const l3::Point& p, const l3::Vector3& n) { return (n.x() * point.x() + n.y() * point.y() - p.dot(n)) / (-n.z()); }
 
+bool isPointInEllipse(const Point& point, const Point& center, const Point& size, double cos_theta, double sin_theta)
+{
+  double dx = point.x() - center.x();
+  double dy = point.y() - center.y();
+
+  double a = (cos_theta * dx + sin_theta * dy) / size.x();
+  a = a * a;
+
+  double b = (sin_theta * dx - cos_theta * dy) / size.y();
+  b = b * b;
+
+  return a + b <= 1;
+}
+
 bool isPointOnPlane(const l3::Point& point, const l3::Point& p, const l3::Vector3& n, double eps)
 {
   return abs(n.x() * point.x() + n.y() * point.y() + n.z() * point.z() - p.dot(n)) <= eps;
@@ -295,19 +309,5 @@ Pose calcFeetCenter(const FootholdConstPtrArray& footholds)
   double num = static_cast<double>(footholds.size());
   return Pose(ref_foot->x() + x / num, ref_foot->y() + y / num, ref_foot->z() + z / num, ref_foot->roll() + roll / num, ref_foot->pitch() + pitch / num,
               ref_foot->yaw() + yaw / num);
-}
-
-bool isPointInEllipse(const Point& point, const Point& center, const Point& size, double cos_theta, double sin_theta)
-{
-  double dx = point.x() - center.x();
-  double dy = point.y() - center.y();
-
-  double a = (cos_theta * dx + sin_theta * dy) / size.x();
-  a = a * a;
-
-  double b = (sin_theta * dx - cos_theta * dy) / size.y();
-  b = b * b;
-
-  return a + b <= 1;
 }
 }  // namespace l3

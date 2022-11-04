@@ -37,11 +37,11 @@
 
 namespace l3
 {
-constexpr double pround(double x, double prec) { return ::round(x / prec) * prec; }
+inline double pround(double x, double prec) { return ::round(x / prec) * prec; }
 
-constexpr double pceil(double x, double prec) { return ::ceil(x / prec) * prec; }
+inline double pceil(double x, double prec) { return ::ceil(x / prec) * prec; }
 
-constexpr double pfloor(double x, double prec) { return ::floor(x / prec) * prec; }
+inline double pfloor(double x, double prec) { return ::floor(x / prec) * prec; }
 
 inline double clamp(double min, double max, double val) { return std::min(std::max(min, val), max); }
 
@@ -71,8 +71,8 @@ constexpr double norm_sq(double x, double y, double z)
   return x * x + y * y + z * z;
 }
 
-constexpr double norm(double x, double y) { return sqrt(norm_sq(x, y)); }
-constexpr double norm(double x, double y, double z) { return sqrt(norm_sq(x, y, z)); }
+inline double norm(double x, double y) { return sqrt(norm_sq(x, y)); }
+inline double norm(double x, double y, double z) { return sqrt(norm_sq(x, y, z)); }
 
 /**
  * @brief Calculates point on linear interpolation between [min; max] based in given (scaling) value in [0; range]
