@@ -163,6 +163,22 @@ TEST(Typedefs, Pose)
   EXPECT_ANGLE_EQ(0.3 * M_PI, pitch);
   EXPECT_ANGLE_EQ(0.1 * M_PI, yaw);
 
+  // check quaternion operation
+  Quaternion q;
+  q.setRPY(0.1 * M_PI, -0.2 * M_PI, 0.3 * M_PI);
+  p = Pose(Position(), q);
+  p.getRPY(roll, pitch, yaw);
+  EXPECT_ANGLE_EQ(0.1 * M_PI, roll);
+  EXPECT_ANGLE_EQ(-0.2 * M_PI, pitch);
+  EXPECT_ANGLE_EQ(0.3 * M_PI, yaw);
+
+  // check consistency using quaternions
+  p.setQuaternion(p.getQuaternion());
+  p.getRPY(roll, pitch, yaw);
+  EXPECT_ANGLE_EQ(0.1 * M_PI, roll);
+  EXPECT_ANGLE_EQ(-0.2 * M_PI, pitch);
+  EXPECT_ANGLE_EQ(0.3 * M_PI, yaw);
+
   // check functions
   EXPECT_DOUBLE_EQ(0.0, Pose().squaredNorm());
   EXPECT_DOUBLE_EQ(0.0, Pose().norm());

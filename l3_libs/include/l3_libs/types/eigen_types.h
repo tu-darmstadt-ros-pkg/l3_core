@@ -151,8 +151,6 @@ struct Quaternion : public Eigen::Quaterniond
   }
 };
 
-
-
 struct Vector2 : public Eigen::Vector2d
 {
   Vector2()
@@ -213,8 +211,6 @@ struct Vector2 : public Eigen::Vector2d
 inline std::ostream& operator<<(std::ostream& stream, const Vector2& vec) { return stream << vec.toString(); }
 
 typedef Vector2 Position2D;
-
-
 
 struct Vector3 : public Eigen::Vector3d
 {
@@ -282,8 +278,6 @@ typedef std::vector<Vector3> Vector3Array;
 typedef std::vector<Point> PointArray;
 typedef Vector3Array ReferenceZMPArray;
 
-
-
 struct Vector4 : public Eigen::Vector4d
 {
   Vector4()
@@ -337,8 +331,6 @@ struct Vector4 : public Eigen::Vector4d
 
 typedef std::vector<Vector4> Vector4Array;
 
-
-
 struct Pose2D : public Eigen::Vector3d
 {
   Pose2D()
@@ -362,8 +354,6 @@ struct Pose2D : public Eigen::Vector3d
   inline void setYaw(double yaw) { this->z() = yaw; }
 };
 
-
-
 /**
  * @brief The Pose struct represents a 4x4 transformation (pose). The data
  * structure is composed by a linear and translation part:
@@ -380,6 +370,12 @@ struct Pose : public Eigen::Affine3d
   {
     setXYZ(x, y, z);
     setRPY(roll, pitch, yaw);
+  }
+
+  Pose(const Eigen::Vector3d& pos, const Eigen::Quaterniond& rot)
+  {
+    setPosition(pos);
+    setQuaternion(rot);
   }
 
   Pose(const Eigen::Affine3d& other)
@@ -418,9 +414,7 @@ struct Pose : public Eigen::Affine3d
 
   inline Point getPosition() const { return Point(translation()); }
 
-  inline Rotation getRotation() const { return rotation(); }
-
-  inline Quaternion getQuaternion() const { return Quaternion(rotation()); }
+  inline void setPosition(const Position& position) { this->position() = position; }
 
   inline double x() const { return getPosition().x(); }
   inline double y() const { return getPosition().y(); }
@@ -437,8 +431,6 @@ struct Pose : public Eigen::Affine3d
     position()(2) = z;
   }
 
-  inline void setPosition(const Position& position) { this->position() = position; }
-
   /**
    * @brief Returns corresponding angle of this pose in range of [-pi, pi].
    * Taken from https://github.com/PointCloudLibrary/pcl/blob/master/common/include/pcl/common/impl/eigen.hpp#L585
@@ -447,6 +439,13 @@ struct Pose : public Eigen::Affine3d
   inline double roll() const { return atan2(m_matrix(2, 1), m_matrix(2, 2)); }
   inline double pitch() const { return asin(-m_matrix(2, 0)); }
   inline double yaw() const { return atan2(m_matrix(1, 0), m_matrix(0, 0)); }
+
+  inline Rotation getRotation() const { return rotation(); }
+
+  inline Quaternion getQuaternion() const { return Quaternion(rotation()); }
+
+  inline void setQuaternion(const Quaternion& q) { setQuaternion(static_cast<Eigen::Quaterniond>(q)); }
+  inline void setQuaternion(const Eigen::Quaterniond& q) { m_matrix.block<3, 3>(0, 0) = q.toRotationMatrix(); }
 
   inline void getRPY(double& roll, double& pitch, double& yaw) const
   {
@@ -510,8 +509,6 @@ struct Pose : public Eigen::Affine3d
 inline std::ostream& operator<<(std::ostream& stream, const Pose& pose) { return stream << pose.toString(); }
 
 typedef std::vector<Pose> PoseArray;
-
-
 
 /**
  * @brief Structure describing homogeneous transformation.
