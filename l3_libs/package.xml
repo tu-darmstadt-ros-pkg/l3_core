@@ -34,6 +34,8 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>roscpp</depend>
+  <depend>boost</depend>
+  <depend>eigen</depend>
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>angles</depend>
@@ -43,6 +45,9 @@
   <depend>vigir_generic_params</depend>
   <depend>l3_msgs</depend>
 
+  <test_depend>gtest</test_depend>
+  <test_depend>roslaunch</test_depend>
+  <test_depend>rostest</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
