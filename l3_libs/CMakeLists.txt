@@ -96,7 +96,7 @@ catkin_package(
   INCLUDE_DIRS include ${Eigen_INCLUDE_DIRS}
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS ${CATKIN_PACKAGE_DEPENDENCIES}
-  DEPENDS Boost Eigen3
+  DEPENDS Boost
 )
 
 ###########
