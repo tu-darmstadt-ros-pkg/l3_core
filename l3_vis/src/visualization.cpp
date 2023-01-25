@@ -147,15 +147,17 @@ visualization_msgs::Marker baseToBaseMarker(const l3_msgs::FloatingBase& base, c
 
   BaseInfo base_info = robot_description.getBaseInfo(BaseInfo::MAIN_BODY_IDX);
 
+  marker.type = visualization_msgs::Marker::ARROW;
+
+  marker.scale.x = 0.2;
+  marker.scale.y = 0.025;
+  marker.scale.z = 0.025;
+
   marker.color = color;
+  marker.color.a = 1.0;
 
   Pose pose;
   poseMsgToL3(base.pose, pose);
-
-  marker.type = visualization_msgs::Marker::SPHERE;
-  marker.scale.x = 0.05;
-  marker.scale.y = 0.05;
-  marker.scale.z = 0.05;
 
   pose = pose * base_info.mesh_offset;
   poseL3ToMsg(pose, marker.pose);
