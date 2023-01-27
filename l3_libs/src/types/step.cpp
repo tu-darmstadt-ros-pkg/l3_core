@@ -153,4 +153,42 @@ FloatingBase::ConstPtr Step::getFloatingBase(const BaseIndex& base_idx) const
 
   return base_step_.getNonMovingLink(base_idx);
 }
+
+void Step::updateMovingOrigin(const FootholdConstPtrArray& footholds, const FloatingBaseConstPtrArray& floating_bases)
+{
+  // update footholds
+  for (Foothold::ConstPtr origin : footholds)
+  {
+    FootStepData::ConstPtr foot_step = footStep().getMovingLink(origin->idx);
+    if (foot_step)
+      footStep().updateMovingLink(origin->idx, FootStepData::make(origin, foot_step->target, foot_step->sway_duration, foot_step->step_duration, foot_step->swing_height));
+  }
+
+  // update floating bases
+  for (FloatingBase::ConstPtr origin : floating_bases)
+  {
+    BaseStepData::ConstPtr base_step = baseStep().getMovingLink(origin->idx);
+    if (base_step)
+      baseStep().updateMovingLink(origin->idx, BaseStepData::make(origin, base_step->target, base_step->step_duration));
+  }
+}
+
+void Step::updateMovingTarget(const FootholdConstPtrArray& footholds, const FloatingBaseConstPtrArray& floating_bases)
+{
+  // update footholds
+  for (Foothold::ConstPtr target : footholds)
+  {
+    FootStepData::ConstPtr foot_step = footStep().getMovingLink(target->idx);
+    if (foot_step)
+      footStep().updateMovingLink(target->idx, FootStepData::make(foot_step->origin, target, foot_step->sway_duration, foot_step->step_duration, foot_step->swing_height));
+  }
+
+  // update floating bases
+  for (FloatingBase::ConstPtr target : floating_bases)
+  {
+    BaseStepData::ConstPtr base_step = baseStep().getMovingLink(target->idx);
+    if (base_step)
+      baseStep().updateMovingLink(target->idx, BaseStepData::make(base_step->origin, target, base_step->step_duration));
+  }
+}
 }  // namespace l3

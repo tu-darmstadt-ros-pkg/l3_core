@@ -175,6 +175,20 @@ public:
    */
   FloatingBase::ConstPtr getFloatingBase(const BaseIndex& base_idx) const;
 
+  /**
+   * @brief Updates origin of the step whereby only moving elements are considered
+   * @param footholds New origin footholds
+   * @param floating_bases New origin floating bases
+   */
+  void updateMovingOrigin(const FootholdConstPtrArray& footholds, const FloatingBaseConstPtrArray& floating_bases);
+
+  /**
+   * @brief Updates target of the step whereby only moving elements are considered
+   * @param footholds New target footholds
+   * @param floating_bases New target floating bases
+   */
+  void updateMovingTarget(const FootholdConstPtrArray& footholds, const FloatingBaseConstPtrArray& floating_bases);
+
   VariantDataSet data;  // may contain user specific data
 
 private:
