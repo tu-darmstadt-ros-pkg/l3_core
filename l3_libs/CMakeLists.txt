@@ -12,6 +12,7 @@ set(CATKIN_PACKAGE_DEPENDENCIES
   std_msgs
   sensor_msgs
   angles
+  tf2_ros
   tf_conversions
   eigen_conversions
   kdl_conversions
