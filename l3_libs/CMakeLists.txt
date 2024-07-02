@@ -95,6 +95,7 @@ set(HEADERS
   include/${PROJECT_NAME}/types/variant_data.h
   include/${PROJECT_NAME}/helper.h
   include/${PROJECT_NAME}/macros.h
+  include/${PROJECT_NAME}/profiler.h
   include/${PROJECT_NAME}/singleton.h
   include/${PROJECT_NAME}/yaml_parser.h
 )
@@ -125,6 +126,7 @@ set(SOURCES
   src/types/step_feedback_queue.cpp
   src/types/variant_data.cpp
   src/helper.cpp
+  src/profiler.cpp
   src/yaml_parser.cpp
 )
 
