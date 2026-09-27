@@ -29,11 +29,7 @@
 #ifndef L3_VARIANT_DATA_H__
 #define L3_VARIANT_DATA_H__
 
-#ifdef __cpp_lib_any
-#include <any>
-#else
 #include <boost/any.hpp>
-#endif
 
 #include <typeindex>
 #include <unordered_map>
@@ -47,11 +43,7 @@
 
 namespace l3
 {
-#ifdef __cpp_lib_any
-typedef std::any any;
-#else
 typedef boost::any any;
-#endif
 
 /**
  * @brief Wrapper for any in order to enable I/O (serialization) of any types.
@@ -153,39 +145,6 @@ public:
 
   inline size_t getTypeHash() const { return type_hash_; }
 
-#ifdef __cpp_lib_any
-  inline bool hasValue() const { return this->has_value(); }
-
-  template <class ValueType>
-  inline ValueType* pointer()
-  {
-    return isType<ValueType>() ? :: ::any_cast<ValueType>(this) : nullptr;
-  }
-
-  template <class ValueType>
-  inline const ValueType& value()
-  {
-    return std::any_cast<const ValueType&>(*this);
-  }
-
-  template <class ValueType>
-  inline ValueType& value()
-  {
-    return std::any_cast<ValueType&>(*this);
-  }
-
-  template <class ValueType>
-  inline bool value(ValueType& val)
-  {
-    if (isType<ValueType>())
-    {
-      val = std::any_cast<ValueType&>(*this);
-      return true;
-    }
-    else
-      return false;
-  }
-#else
   inline bool hasValue() const { return !empty(); }
 
   template <class ValueType>
@@ -217,7 +176,6 @@ public:
     else
       return false;
   }
-#endif
 
 private:
   size_t type_hash_;
